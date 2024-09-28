@@ -1,0 +1,107 @@
+package com.lilemy.codechallenge.service;
+
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.lilemy.codechallenge.model.dto.user.UserQueryRequest;
+import com.lilemy.codechallenge.model.entity.User;
+import com.baomidou.mybatisplus.extension.service.IService;
+import com.lilemy.codechallenge.model.vo.LoginUserVO;
+import com.lilemy.codechallenge.model.vo.UserVO;
+
+import java.util.List;
+
+/**
+ * @author qq233
+ * @description 针对表【user(用户)】的数据库操作Service
+ */
+public interface UserService extends IService<User> {
+
+    /**
+     * 用户注册
+     *
+     * @param userAccount   用户账户
+     * @param userPassword  用户密码
+     * @param checkPassword 校验密码
+     * @return 新用户 id
+     */
+    long userRegister(String userAccount, String userPassword, String checkPassword);
+
+    /**
+     * 用户登录
+     *
+     * @param userAccount  用户账户
+     * @param userPassword 用户密码
+     * @return 用户信息（脱敏）
+     */
+    LoginUserVO userLogin(String userAccount, String userPassword);
+
+    /**
+     * 用户注销
+     *
+     * @return 注销状态
+     */
+    boolean userLogout();
+
+    /**
+     * 获取当前用户
+     *
+     * @return 获取当前登录用户
+     */
+    User getLoginUser();
+
+    /**
+     * 获取脱敏用户信息
+     *
+     * @param user 用户信息
+     * @return 脱敏用户
+     */
+    LoginUserVO getLoginUserVO(User user);
+
+    /**
+     * 获取脱敏用户信息
+     *
+     * @param user 用户
+     * @return 脱敏用户信息
+     */
+    UserVO getUserVO(User user);
+
+    /**
+     * 获取脱敏用户信息
+     *
+     * @param userId 用户id
+     * @return 脱敏用户信息
+     */
+    UserVO getUserVO(Long userId);
+
+    /**
+     * 获取脱敏的用户信息
+     *
+     * @param userList 用户列表
+     * @return 脱敏用户列表
+     */
+    List<UserVO> getUserVO(List<User> userList);
+
+
+    /**
+     * 是否为管理员
+     *
+     * @return true -> 管理员
+     */
+    boolean isAdmin();
+
+    /**
+     * 是否为管理员
+     *
+     * @param user 用户信息
+     * @return true -> 管理员
+     */
+    boolean isAdmin(User user);
+
+    /**
+     * 用户分页查询
+     *
+     * @param userQueryRequest 分页查询请求体
+     * @return User
+     */
+    Wrapper<User> getQueryWrapper(UserQueryRequest userQueryRequest);
+
+}
