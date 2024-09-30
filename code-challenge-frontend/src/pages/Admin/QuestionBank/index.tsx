@@ -1,32 +1,34 @@
-import CreateForm from '@/pages/Admin/User/components/CreateForm';
-import UpdateForm from '@/pages/Admin/User/components/UpdateForm';
-import { deleteUser, listUserByPage } from '@/services/code-challenge/userController';
+import CreateForm from '@/pages/Admin/QuestionBank/components/CreateForm';
+import UpdateForm from '@/pages/Admin/QuestionBank/components/UpdateForm';
+import {
+  deleteQuestionBank,
+  listQuestionBankByPage,
+} from '@/services/code-challenge/questionBankController';
 import { PlusOutlined } from '@ant-design/icons';
-import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { PageContainer, ProTable } from '@ant-design/pro-components';
-import '@umijs/max';
+import { type ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Button, message, Space, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 
-const UserTableList: React.FC = () => {
-  // 新建窗口的弹窗
-  const [createModalOpen, handleCreateModalOpen] = useState<boolean>(false);
-  // 更新窗口的弹窗
-  const [updateModalOpen, handleUpdateModalOpen] = useState<boolean>(false);
+const QuestionBankTableList: React.FC = () => {
+  // 是否显示新建窗口
+  const [createModalVisible, setCreateModalVisible] = useState<boolean>(false);
+  // 是否显示更新窗口
+  const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
-  const [currentRow, setCurrentRow] = useState<API.User>();
+  // 当前题库的数据
+  const [currentRow, setCurrentRow] = useState<API.QuestionBank>();
 
   /**
-   * @zh-CN 删除用户
+   * @zh-CN 删除题库
    *
-   * @param user
+   * @param questionBank
    */
-  const handleDelete = async (user: API.User) => {
+  const handleDelete = async (questionBank: API.QuestionBank) => {
     const hide = message.loading('正在删除');
-    if (!user) return true;
+    if (!questionBank) return true;
     try {
-      await deleteUser({
-        id: user.id,
+      await deleteQuestionBank({
+        id: questionBank.id,
       });
       hide();
       message.success('删除成功');
@@ -39,52 +41,31 @@ const UserTableList: React.FC = () => {
     }
   };
 
-  const columns: ProColumns<API.User>[] = [
+  const columns: ProColumns<API.QuestionBank>[] = [
     {
       title: 'id',
       dataIndex: 'id',
       valueType: 'text',
-      width: 160,
+      hideInForm: true,
     },
     {
-      title: '账号',
-      dataIndex: 'userAccount',
+      title: '标题',
+      dataIndex: 'title',
       valueType: 'text',
     },
     {
-      title: '用户名',
-      dataIndex: 'username',
+      title: '描述',
+      dataIndex: 'description',
       valueType: 'text',
     },
     {
-      title: '头像',
-      dataIndex: 'userAvatar',
+      title: '图片',
+      dataIndex: 'picture',
       valueType: 'image',
       fieldProps: {
         width: 64,
       },
       hideInSearch: true,
-      width: 80,
-    },
-    {
-      title: '简介',
-      dataIndex: 'userProfile',
-      valueType: 'textarea',
-    },
-    {
-      title: '权限',
-      dataIndex: 'userRole',
-      valueEnum: {
-        user: {
-          text: '用户',
-          status: 'Default',
-        },
-        admin: {
-          text: '管理员',
-          status: 'Success',
-        },
-      },
-      width: 100,
     },
     {
       title: '创建时间',
@@ -92,7 +73,15 @@ const UserTableList: React.FC = () => {
       dataIndex: 'createTime',
       valueType: 'dateTime',
       hideInSearch: true,
-      width: 150,
+      hideInForm: true,
+    },
+    {
+      title: '编辑时间',
+      sorter: true,
+      dataIndex: 'editTime',
+      valueType: 'dateTime',
+      hideInSearch: true,
+      hideInForm: true,
     },
     {
       title: '更新时间',
@@ -100,31 +89,23 @@ const UserTableList: React.FC = () => {
       dataIndex: 'updateTime',
       valueType: 'dateTime',
       hideInSearch: true,
-      width: 150,
+      hideInForm: true,
     },
     {
       title: '操作',
       dataIndex: 'option',
       valueType: 'option',
-      width: 100,
-      fixed: 'right',
       render: (_, record) => (
-        <Space size={'middle'}>
+        <Space size="middle">
           <Typography.Link
-            key="config"
             onClick={() => {
-              handleUpdateModalOpen(true);
               setCurrentRow(record);
+              setUpdateModalVisible(true);
             }}
           >
             修改
           </Typography.Link>
-          <Typography.Link
-            type="danger"
-            onClick={() => {
-              handleDelete(record);
-            }}
-          >
+          <Typography.Link type="danger" onClick={() => handleDelete(record)}>
             删除
           </Typography.Link>
         </Space>
@@ -134,8 +115,8 @@ const UserTableList: React.FC = () => {
 
   return (
     <PageContainer>
-      <ProTable<API.User, API.PageUser>
-        headerTitle={'用户信息'}
+      <ProTable<API.QuestionBank, API.PageQuestionBank>
+        headerTitle={'题库信息'}
         actionRef={actionRef}
         rowKey="id"
         search={{
@@ -147,7 +128,7 @@ const UserTableList: React.FC = () => {
             type="primary"
             key="primary"
             onClick={() => {
-              handleCreateModalOpen(true);
+              setCreateModalVisible(true);
             }}
           >
             <PlusOutlined /> 新建
@@ -156,12 +137,12 @@ const UserTableList: React.FC = () => {
         request={async (params, sort, filter) => {
           const sortField = Object.keys(sort)?.[0];
           const sortOrder = sort?.[sortField] ?? undefined;
-          const { data, code } = await listUserByPage({
+          const { data, code } = await listQuestionBankByPage({
             ...params,
             sortField,
             sortOrder,
             ...filter,
-          } as API.UserQueryRequest);
+          } as API.QuestionBankQueryRequest);
           return {
             success: code === 0,
             data: data?.records || [],
@@ -171,30 +152,30 @@ const UserTableList: React.FC = () => {
         columns={columns}
       />
       <CreateForm
-        modalVisible={createModalOpen}
+        modalVisible={createModalVisible}
         columns={columns}
         onSubmit={() => {
-          handleCreateModalOpen(false);
+          setCreateModalVisible(false);
           actionRef.current?.reload();
         }}
         onCancel={() => {
-          handleCreateModalOpen(false);
+          setCreateModalVisible(false);
         }}
       />
       <UpdateForm
-        modalVisible={updateModalOpen}
+        modalVisible={updateModalVisible}
         columns={columns}
         oldData={currentRow}
         onSubmit={() => {
-          handleUpdateModalOpen(false);
-          setCurrentRow(undefined);
-          actionRef.current?.reload();
+          setUpdateModalVisible(false);
         }}
         onCancel={() => {
-          handleUpdateModalOpen(false);
+          setUpdateModalVisible(false);
+          actionRef.current?.reload();
         }}
       />
     </PageContainer>
   );
 };
-export default UserTableList;
+
+export default QuestionBankTableList;
