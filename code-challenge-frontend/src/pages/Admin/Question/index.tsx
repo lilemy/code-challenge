@@ -1,6 +1,7 @@
 import MdEditor from '@/components/Markdown/MdEditor';
 import TagList from '@/components/TagList';
 import CreateForm from '@/pages/Admin/Question/components/CreateForm';
+import UpdateBankModal from '@/pages/Admin/Question/components/UpdateBankModal';
 import UpdateForm from '@/pages/Admin/Question/components/UpdateForm';
 import { deleteQuestion, listQuestionByPage } from '@/services/code-challenge/questionController';
 import { PlusOutlined } from '@ant-design/icons';
@@ -13,6 +14,8 @@ const QuestionTableList: React.FC = () => {
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false);
   // 是否显示更新窗口
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
+  // 是否显示更新所属题库的弹窗
+  const [updateBankModalVisible, setUpdateBankModalVisible] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
   // 当前题目的数据
   const [currentRow, setCurrentRow] = useState<API.Question>();
@@ -45,6 +48,12 @@ const QuestionTableList: React.FC = () => {
       title: 'id',
       dataIndex: 'id',
       valueType: 'text',
+      hideInForm: true,
+    },
+    {
+      title: '所属题库',
+      dataIndex: 'questionBankId',
+      hideInTable: true,
       hideInForm: true,
     },
     {
@@ -133,6 +142,14 @@ const QuestionTableList: React.FC = () => {
           <Typography.Link
             onClick={() => {
               setCurrentRow(record);
+              setUpdateBankModalVisible(true);
+            }}
+          >
+            修改所属题库
+          </Typography.Link>
+          <Typography.Link
+            onClick={() => {
+              setCurrentRow(record);
               setUpdateModalVisible(true);
             }}
           >
@@ -205,6 +222,13 @@ const QuestionTableList: React.FC = () => {
         }}
         onCancel={() => {
           setUpdateModalVisible(false);
+        }}
+      />
+      <UpdateBankModal
+        questionId={currentRow?.id}
+        visible={updateBankModalVisible}
+        onCancel={() => {
+          setUpdateBankModalVisible(false);
         }}
       />
     </PageContainer>

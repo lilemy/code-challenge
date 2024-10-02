@@ -2,7 +2,7 @@ import TagList from '@/components/TagList';
 import { listQuestionVoByPage } from '@/services/code-challenge/questionController';
 import { Link } from '@@/exports';
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
-import Title from 'antd/lib/typography/Title';
+import Title from 'antd/es/typography/Title';
 import React, { useRef } from 'react';
 
 const Question: React.FC = () => {

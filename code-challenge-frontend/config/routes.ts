@@ -6,7 +6,25 @@ export default [
   },
   { path: '/welcome', name: '欢迎', icon: 'smile', component: './Welcome' },
   { path: '/banks', name: '题库', icon: 'table', component: './Bank' },
+  {
+    path: '/bank/:questionBankId',
+    name: '题库详情',
+    component: './Bank/BankDetail',
+    hideInMenu: true,
+  },
+  {
+    path: '/bank/:questionBankId/question/:questionId',
+    name: '题目详情',
+    component: './Bank/BankQuestionDetail',
+    hideInMenu: true,
+  },
   { path: '/questions', name: '题目', icon: 'bars', component: './Question' },
+  {
+    path: '/question/:questionId',
+    name: '题目详情',
+    component: './Question/QuestionDetail',
+    hideInMenu: true,
+  },
   {
     path: '/admin',
     name: '管理页',

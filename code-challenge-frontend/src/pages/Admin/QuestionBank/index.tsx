@@ -168,10 +168,10 @@ const QuestionBankTableList: React.FC = () => {
         oldData={currentRow}
         onSubmit={() => {
           setUpdateModalVisible(false);
+          actionRef.current?.reload();
         }}
         onCancel={() => {
           setUpdateModalVisible(false);
-          actionRef.current?.reload();
         }}
       />
     </PageContainer>

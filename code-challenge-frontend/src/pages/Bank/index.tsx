@@ -1,7 +1,7 @@
 import QuestionBankList from '@/components/QuestionBankList';
 import { listQuestionBankVoByPage } from '@/services/code-challenge/questionBankController';
 import { Card, message } from 'antd';
-import Title from 'antd/lib/typography/Title';
+import Title from 'antd/es/typography/Title';
 import React, { useEffect, useState } from 'react';
 
 const Bank: React.FC = () => {

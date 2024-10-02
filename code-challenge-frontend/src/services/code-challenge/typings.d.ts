@@ -29,6 +29,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponsePageQuestionBankQuestionVO = {
+    code?: number;
+    data?: PageQuestionBankQuestionVO;
+    message?: string;
+  };
+
   type BaseResponsePageQuestionBankVO = {
     code?: number;
     data?: PageQuestionBankVO;
@@ -50,6 +56,12 @@ declare namespace API {
   type BaseResponsePageUserVO = {
     code?: number;
     data?: PageUserVO;
+    message?: string;
+  };
+
+  type BaseResponseQuestionBankQuestionVO = {
+    code?: number;
+    data?: QuestionBankQuestionVO;
     message?: string;
   };
 
@@ -79,6 +91,10 @@ declare namespace API {
 
   type DeleteRequest = {
     id?: number;
+  };
+
+  type getQuestionBankQuestionVOByIdParams = {
+    id: number;
   };
 
   type getQuestionBankVOByIdParams = {
@@ -137,6 +153,20 @@ declare namespace API {
     orders?: OrderItem[];
     optimizeCountSql?: PageQuestionBank;
     searchCount?: PageQuestionBank;
+    optimizeJoinOfCountSql?: boolean;
+    maxLimit?: number;
+    countId?: string;
+    pages?: number;
+  };
+
+  type PageQuestionBankQuestionVO = {
+    records?: QuestionBankQuestionVO[];
+    total?: number;
+    size?: number;
+    current?: number;
+    orders?: OrderItem[];
+    optimizeCountSql?: PageQuestionBankQuestionVO;
+    searchCount?: PageQuestionBankQuestionVO;
     optimizeJoinOfCountSql?: boolean;
     maxLimit?: number;
     countId?: string;
@@ -266,9 +296,38 @@ declare namespace API {
     questionId?: number;
   };
 
+  type QuestionBankQuestionQueryRequest = {
+    current?: number;
+    pageSize?: number;
+    sortField?: string;
+    sortOrder?: string;
+    id?: number;
+    notId?: number;
+    questionBankId?: number;
+    questionId?: number;
+    userId?: number;
+  };
+
   type QuestionBankQuestionRemoveRequest = {
     questionBankId?: number;
     questionId?: number;
+  };
+
+  type QuestionBankQuestionUpdateRequest = {
+    id?: number;
+    questionBankId?: number;
+    questionId?: number;
+  };
+
+  type QuestionBankQuestionVO = {
+    id?: number;
+    questionBankId?: number;
+    questionId?: number;
+    userId?: number;
+    createTime?: string;
+    updateTime?: string;
+    tagList?: string[];
+    user?: UserVO;
   };
 
   type QuestionBankUpdateRequest = {

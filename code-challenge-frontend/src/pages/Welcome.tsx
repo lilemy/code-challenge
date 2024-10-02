@@ -4,7 +4,7 @@ import { listQuestionBankVoByPage } from '@/services/code-challenge/questionBank
 import { listQuestionVoByPage } from '@/services/code-challenge/questionController';
 import { Link } from '@@/exports';
 import { Card, Divider, Flex, message } from 'antd';
-import Title from 'antd/lib/typography/Title';
+import Title from 'antd/es/typography/Title';
 import React, { useEffect, useState } from 'react';
 
 /**
