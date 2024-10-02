@@ -12,3 +12,7 @@ spring:
       host: localhost
       port: 6379
       timeout: 5000
+# mybatis-plus配置
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl

@@ -249,10 +249,11 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
                         .collect(Collectors.toSet());
                 // 复用原有题目表的查询条件
                 queryWrapper.in("id", questionIdSet);
+                // 查询数据库
+                return this.page(new Page<>(current, size), queryWrapper);
             }
         }
-        // 查询数据库
-        return this.page(new Page<>(current, size), queryWrapper);
+        return new Page<>(current, size);
     }
 
 }
