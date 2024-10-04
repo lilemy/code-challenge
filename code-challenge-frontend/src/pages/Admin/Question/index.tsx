@@ -225,6 +225,7 @@ const QuestionTableList: React.FC = () => {
         }}
       />
       <UpdateBankModal
+        questionTitle={currentRow?.title}
         questionId={currentRow?.id}
         visible={updateBankModalVisible}
         onCancel={() => {

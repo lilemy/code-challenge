@@ -8,6 +8,7 @@ import { Form, message, Modal, Select } from 'antd';
 import React, { useEffect, useState } from 'react';
 
 interface Props {
+  questionTitle?: string;
   questionId?: number;
   visible: boolean;
   onCancel: () => void;
@@ -19,7 +20,7 @@ interface Props {
  * @constructor
  */
 const UpdateBankModal: React.FC<Props> = (props) => {
-  const { questionId, visible, onCancel } = props;
+  const { questionTitle, questionId, visible, onCancel } = props;
   const [form] = Form.useForm();
   const [questionBankList, setQuestionBankList] = useState<API.QuestionBankVO[]>([]);
 
@@ -67,7 +68,7 @@ const UpdateBankModal: React.FC<Props> = (props) => {
   return (
     <Modal
       destroyOnClose
-      title={'更新所属题库'}
+      title={`更新所属题库：${questionTitle ?? ''}`}
       open={visible}
       footer={null}
       onCancel={() => {

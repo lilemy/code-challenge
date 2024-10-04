@@ -177,4 +177,27 @@ public class UserController {
     }
 
     // endregion
+
+    // region 用户签到
+
+    @Operation(summary = "添加用户签到记录")
+    @PostMapping("/add/sign_in")
+    public BaseResponse<Boolean> addUserSignIn() {
+        // 必须要登录才能签到
+        User loginUser = userService.getLoginUser();
+        boolean result = userService.addUserSignIn(loginUser.getId());
+        return ResultUtils.success(result);
+    }
+
+    @Operation(summary = "获取用户签到记录")
+    @GetMapping("/get/sign_in")
+    public BaseResponse<List<Integer>> getUserSignInRecord(Integer year) {
+        // 必须要登录才能获取
+        User loginUser = userService.getLoginUser();
+        List<Integer> userSignInRecord = userService.getUserSignInRecord(loginUser.getId(), year);
+        return ResultUtils.success(userSignInRecord);
+    }
+
+    // endregion
+
 }

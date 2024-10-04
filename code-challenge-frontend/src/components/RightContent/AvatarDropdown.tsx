@@ -1,3 +1,5 @@
+import { userLogout } from '@/services/code-challenge/userController';
+import { Link } from '@@/exports';
 import { LogoutOutlined, UserOutlined } from '@ant-design/icons';
 import { history, useModel } from '@umijs/max';
 import { Avatar, Button, Space } from 'antd';
@@ -5,8 +7,6 @@ import type { MenuInfo } from 'rc-menu/lib/interface';
 import React, { useCallback } from 'react';
 import { flushSync } from 'react-dom';
 import HeaderDropdown from '../HeaderDropdown';
-import { Link } from '@@/exports';
-import {userLogout} from "@/services/code-challenge/userController";
 
 export type GlobalHeaderRightProps = {
   menu?: boolean;

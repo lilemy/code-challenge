@@ -1,9 +1,9 @@
 package com.lilemy.codechallenge.service;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.extension.service.IService;
 import com.lilemy.codechallenge.model.dto.user.UserQueryRequest;
 import com.lilemy.codechallenge.model.entity.User;
-import com.baomidou.mybatisplus.extension.service.IService;
 import com.lilemy.codechallenge.model.vo.LoginUserVO;
 import com.lilemy.codechallenge.model.vo.UserVO;
 
@@ -95,6 +95,24 @@ public interface UserService extends IService<User> {
      * @return true -> 管理员
      */
     boolean isAdmin(User user);
+
+    /**
+     * 添加用户签到记录
+     *
+     * @param userId 用户 id
+     * @return 当前是否已签到成功
+     */
+    boolean addUserSignIn(long userId);
+
+    /**
+     * 获取用户指定年份的签到记录
+     *
+     * @param userId 用户 id
+     * @param year   年份（为空表示当前年份）
+     * @return 签到记录映射
+     */
+    List<Integer> getUserSignInRecord(long userId, Integer year);
+
 
     /**
      * 用户分页查询
