@@ -3,14 +3,13 @@ package com.lilemy.codechallenge.controller;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lilemy.codechallenge.annotation.AuthCheck;
 import com.lilemy.codechallenge.common.BaseResponse;
 import com.lilemy.codechallenge.common.ResultCode;
 import com.lilemy.codechallenge.common.ResultUtils;
+import com.lilemy.codechallenge.constant.UserConstant;
 import com.lilemy.codechallenge.exception.ThrowUtils;
-import com.lilemy.codechallenge.model.dto.questionbankquestion.QuestionBankQuestionAddRequest;
-import com.lilemy.codechallenge.model.dto.questionbankquestion.QuestionBankQuestionQueryRequest;
-import com.lilemy.codechallenge.model.dto.questionbankquestion.QuestionBankQuestionRemoveRequest;
-import com.lilemy.codechallenge.model.dto.questionbankquestion.QuestionBankQuestionUpdateRequest;
+import com.lilemy.codechallenge.model.dto.questionbankquestion.*;
 import com.lilemy.codechallenge.model.entity.QuestionBankQuestion;
 import com.lilemy.codechallenge.model.entity.User;
 import com.lilemy.codechallenge.model.vo.QuestionBankQuestionVO;
@@ -37,9 +36,9 @@ public class QuestionBankQuestionController {
 
     @Operation(summary = "创建题库题目关联")
     @PostMapping("/add")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Long> addQuestionBankQuestion(@RequestBody QuestionBankQuestionAddRequest questionBankQuestionAddRequest) {
         ThrowUtils.throwIf(questionBankQuestionAddRequest == null, ResultCode.PARAMS_ERROR);
-        ThrowUtils.throwIf(!userService.isAdmin(), ResultCode.NO_AUTH_ERROR);
         QuestionBankQuestion questionBankQuestion = new QuestionBankQuestion();
         BeanUtils.copyProperties(questionBankQuestionAddRequest, questionBankQuestion);
         // 参数校验
@@ -57,12 +56,12 @@ public class QuestionBankQuestionController {
 
     @Operation(summary = "移除题库题目关联")
     @PostMapping("/remove")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> removeQuestionBankQuestion(
             @RequestBody QuestionBankQuestionRemoveRequest questionBankQuestionRemoveRequest
     ) {
         // 参数校验
         ThrowUtils.throwIf(questionBankQuestionRemoveRequest == null, ResultCode.PARAMS_ERROR);
-        ThrowUtils.throwIf(!userService.isAdmin(), ResultCode.NO_AUTH_ERROR);
         Long questionBankId = questionBankQuestionRemoveRequest.getQuestionBankId();
         Long questionId = questionBankQuestionRemoveRequest.getQuestionId();
         ThrowUtils.throwIf(questionBankId == null || questionId == null, ResultCode.PARAMS_ERROR);
@@ -76,10 +75,10 @@ public class QuestionBankQuestionController {
 
     @Operation(summary = "更新题库题目关联")
     @PostMapping("/update")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updateQuestionBankQuestion(@RequestBody QuestionBankQuestionUpdateRequest questionBankQuestionUpdateRequest) {
         // 参数校验
         ThrowUtils.throwIf(questionBankQuestionUpdateRequest == null, ResultCode.PARAMS_ERROR);
-        ThrowUtils.throwIf(!userService.isAdmin(), ResultCode.NO_AUTH_ERROR);
         QuestionBankQuestion questionBankQuestion = new QuestionBankQuestion();
         BeanUtils.copyProperties(questionBankQuestionUpdateRequest, questionBankQuestion);
         questionBankQuestionService.validQuestionBankQuestion(questionBankQuestion, false);
@@ -109,5 +108,23 @@ public class QuestionBankQuestionController {
                 questionBankQuestionService.getQueryWrapper(questionBankQuestionQueryRequest));
         // 获取封装类
         return ResultUtils.success(questionBankQuestionService.getQuestionBankQuestionVOPage(questionBankQuestionPage));
+    }
+
+    @Operation(summary = "批量添加题目到题库")
+    @PostMapping("/add/batch")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> batchAddQuestionsToBank(@RequestBody QuestionBankQuestionBatchRequest questionBankQuestionBatchAddRequest) {
+        ThrowUtils.throwIf(questionBankQuestionBatchAddRequest == null, ResultCode.PARAMS_ERROR);
+        questionBankQuestionService.batchAddQuestionsToBank(questionBankQuestionBatchAddRequest);
+        return ResultUtils.success(true);
+    }
+
+    @Operation(summary = "批量从题库移除题目")
+    @PostMapping("remove/batch")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> batchRemoveQuestionsFromBank(@RequestBody QuestionBankQuestionBatchRequest questionBankQuestionBatchRemoveRequest) {
+        ThrowUtils.throwIf(questionBankQuestionBatchRemoveRequest == null, ResultCode.PARAMS_ERROR);
+        questionBankQuestionService.batchRemoveQuestionsFromBank(questionBankQuestionBatchRemoveRequest);
+        return ResultUtils.success(true);
     }
 }

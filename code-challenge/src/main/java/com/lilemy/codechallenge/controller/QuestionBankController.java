@@ -1,10 +1,12 @@
 package com.lilemy.codechallenge.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lilemy.codechallenge.annotation.AuthCheck;
 import com.lilemy.codechallenge.common.BaseResponse;
 import com.lilemy.codechallenge.common.DeleteRequest;
 import com.lilemy.codechallenge.common.ResultCode;
 import com.lilemy.codechallenge.common.ResultUtils;
+import com.lilemy.codechallenge.constant.UserConstant;
 import com.lilemy.codechallenge.exception.ThrowUtils;
 import com.lilemy.codechallenge.model.dto.question.QuestionQueryRequest;
 import com.lilemy.codechallenge.model.dto.questionbank.QuestionBankAddRequest;
@@ -16,7 +18,6 @@ import com.lilemy.codechallenge.model.vo.QuestionBankVO;
 import com.lilemy.codechallenge.model.vo.QuestionVO;
 import com.lilemy.codechallenge.service.QuestionBankService;
 import com.lilemy.codechallenge.service.QuestionService;
-import com.lilemy.codechallenge.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -35,15 +36,12 @@ public class QuestionBankController {
     @Resource
     private QuestionService questionService;
 
-    @Resource
-    private UserService userService;
-
     // region 增删改查
 
     @Operation(summary = "添加题库")
     @PostMapping("/add")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Long> addQuestionBank(@RequestBody QuestionBankAddRequest questionBankAddRequest) {
-        ThrowUtils.throwIf(!userService.isAdmin(), ResultCode.NO_AUTH_ERROR);
         ThrowUtils.throwIf(questionBankAddRequest == null, ResultCode.PARAMS_ERROR);
         Long addQuestionBankId = questionBankService.addQuestionBank(questionBankAddRequest);
         return ResultUtils.success(addQuestionBankId);
@@ -51,8 +49,8 @@ public class QuestionBankController {
 
     @Operation(summary = "删除题库")
     @PostMapping("/delete")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteQuestionBank(@RequestBody DeleteRequest deleteRequest) {
-        ThrowUtils.throwIf(!userService.isAdmin(), ResultCode.NO_AUTH_ERROR);
         ThrowUtils.throwIf(deleteRequest == null, ResultCode.PARAMS_ERROR);
         Long questionBankId = deleteRequest.getId();
         ThrowUtils.throwIf(questionBankId <= 0, ResultCode.PARAMS_ERROR);
@@ -62,8 +60,8 @@ public class QuestionBankController {
 
     @Operation(summary = "更新题库")
     @PostMapping("/update")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updateQuestionBank(@RequestBody QuestionBankUpdateRequest questionBankUpdateRequest) {
-        ThrowUtils.throwIf(!userService.isAdmin(), ResultCode.NO_AUTH_ERROR);
         ThrowUtils.throwIf(questionBankUpdateRequest == null, ResultCode.PARAMS_ERROR);
         Boolean result = questionBankService.updateQuestionBank(questionBankUpdateRequest);
         return ResultUtils.success(result);
@@ -91,8 +89,8 @@ public class QuestionBankController {
 
     @Operation(summary = "分页获取题库列表（仅管理员可用）")
     @PostMapping("/list")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Page<QuestionBank>> listQuestionBankByPage(@RequestBody QuestionBankQueryRequest questionBankQueryRequest) {
-        ThrowUtils.throwIf(!userService.isAdmin(), ResultCode.NO_AUTH_ERROR);
         long current = questionBankQueryRequest.getCurrent();
         long size = questionBankQueryRequest.getPageSize();
         // 查询数据库

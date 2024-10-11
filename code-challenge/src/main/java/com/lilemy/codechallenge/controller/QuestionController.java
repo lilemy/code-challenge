@@ -1,15 +1,14 @@
 package com.lilemy.codechallenge.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lilemy.codechallenge.annotation.AuthCheck;
 import com.lilemy.codechallenge.common.BaseResponse;
 import com.lilemy.codechallenge.common.DeleteRequest;
 import com.lilemy.codechallenge.common.ResultCode;
 import com.lilemy.codechallenge.common.ResultUtils;
+import com.lilemy.codechallenge.constant.UserConstant;
 import com.lilemy.codechallenge.exception.ThrowUtils;
-import com.lilemy.codechallenge.model.dto.question.QuestionAddRequest;
-import com.lilemy.codechallenge.model.dto.question.QuestionEditRequest;
-import com.lilemy.codechallenge.model.dto.question.QuestionQueryRequest;
-import com.lilemy.codechallenge.model.dto.question.QuestionUpdateRequest;
+import com.lilemy.codechallenge.model.dto.question.*;
 import com.lilemy.codechallenge.model.entity.Question;
 import com.lilemy.codechallenge.model.entity.User;
 import com.lilemy.codechallenge.model.vo.QuestionVO;
@@ -53,6 +52,14 @@ public class QuestionController {
         return ResultUtils.success(result);
     }
 
+    @Operation(summary = "批量删除题目")
+    @PostMapping("/delete/batch")
+    public BaseResponse<Boolean> deleteQuestionBatch(@RequestBody QuestionBatchDeleteRequest questionBatchDeleteRequest) {
+        ThrowUtils.throwIf(questionBatchDeleteRequest == null, ResultCode.PARAMS_ERROR);
+        boolean result = questionService.batchDeleteQuestions(questionBatchDeleteRequest.getQuestionIdList());
+        return ResultUtils.success(result);
+    }
+
     @Operation(summary = "编辑题目")
     @PostMapping("/edit")
     public BaseResponse<Boolean> editQuestion(@RequestBody QuestionEditRequest questionEditRequest) {
@@ -64,10 +71,10 @@ public class QuestionController {
 
     @Operation(summary = "更新题目")
     @PostMapping("/update")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updateQuestion(@RequestBody QuestionUpdateRequest questionUpdateRequest) {
         ThrowUtils.throwIf(questionUpdateRequest == null, ResultCode.PARAMS_ERROR);
         ThrowUtils.throwIf(questionUpdateRequest.getId() <= 0, ResultCode.PARAMS_ERROR);
-        ThrowUtils.throwIf(!userService.isAdmin(), ResultCode.NO_AUTH_ERROR);
         boolean result = questionService.updateQuestion(questionUpdateRequest);
         return ResultUtils.success(result);
     }
@@ -85,9 +92,9 @@ public class QuestionController {
 
     @Operation(summary = "分页获取题目列表（仅管理员可用）")
     @PostMapping("/list")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Page<Question>> listQuestionByPage(@RequestBody QuestionQueryRequest questionQueryRequest) {
         ThrowUtils.throwIf(questionQueryRequest == null, ResultCode.PARAMS_ERROR);
-        ThrowUtils.throwIf(!userService.isAdmin(), ResultCode.NO_AUTH_ERROR);
         long current = questionQueryRequest.getCurrent();
         long size = questionQueryRequest.getPageSize();
         // 查询数据库
@@ -123,7 +130,14 @@ public class QuestionController {
 
     // endregion
 
-    // region 题目审核
-    // todo 题目审核
+    // region 审核题目
+    @Operation(summary = "审核题目")
+    @PostMapping("/review")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> reviewQuestion(@RequestBody QuestionReviewRequest questionReviewRequest) {
+        ThrowUtils.throwIf(questionReviewRequest == null, ResultCode.PARAMS_ERROR);
+        boolean result = questionService.reviewQuestion(questionReviewRequest);
+        return ResultUtils.success(result);
+    }
     // endregion
 }

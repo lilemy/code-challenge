@@ -2,13 +2,12 @@ package com.lilemy.codechallenge.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.lilemy.codechallenge.model.dto.question.QuestionAddRequest;
-import com.lilemy.codechallenge.model.dto.question.QuestionEditRequest;
-import com.lilemy.codechallenge.model.dto.question.QuestionQueryRequest;
-import com.lilemy.codechallenge.model.dto.question.QuestionUpdateRequest;
+import com.lilemy.codechallenge.model.dto.question.*;
 import com.lilemy.codechallenge.model.entity.Question;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lilemy.codechallenge.model.vo.QuestionVO;
+
+import java.util.List;
 
 /**
  * @author qq233
@@ -88,4 +87,27 @@ public interface QuestionService extends IService<Question> {
      */
     Page<Question> listQuestionByPage(QuestionQueryRequest questionQueryRequest);
 
+    /**
+     * Es 搜索分页获取题目列表
+     *
+     * @param questionQueryRequest 题目查询请求体
+     * @return 题目分页列表
+     */
+    Page<Question> searchFromEs(QuestionQueryRequest questionQueryRequest);
+
+    /**
+     * 题目审核
+     *
+     * @param questionReviewRequest 题目审核请求体
+     * @return 是否操作成功
+     */
+    boolean reviewQuestion(QuestionReviewRequest questionReviewRequest);
+
+    /**
+     * 批量删除题目
+     *
+     * @param questionIdList 删除题目 id 列表
+     * @return 是否操作成功
+     */
+    boolean batchDeleteQuestions(List<Long> questionIdList);
 }

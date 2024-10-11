@@ -2,10 +2,14 @@ package com.lilemy.codechallenge.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lilemy.codechallenge.model.dto.questionbankquestion.QuestionBankQuestionBatchRequest;
 import com.lilemy.codechallenge.model.dto.questionbankquestion.QuestionBankQuestionQueryRequest;
 import com.lilemy.codechallenge.model.entity.QuestionBankQuestion;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lilemy.codechallenge.model.vo.QuestionBankQuestionVO;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 /**
  * @author qq233
@@ -44,4 +48,26 @@ public interface QuestionBankQuestionService extends IService<QuestionBankQuesti
      * @return 题库题目关联分页封装
      */
     Page<QuestionBankQuestionVO> getQuestionBankQuestionVOPage(Page<QuestionBankQuestion> questionBankQuestionPage);
+
+    /**
+     * 批量添加题目到题库
+     *
+     * @param batchAdd 批量添加题目到题库请求体
+     */
+    void batchAddQuestionsToBank(QuestionBankQuestionBatchRequest batchAdd);
+
+    /**
+     * 批量添加题目到题库（内部）
+     *
+     * @param questionBankQuestions 符合条件的题库题目关联列表
+     */
+    @Transactional(rollbackFor = Exception.class)
+    void batchAddQuestionsToBankInner(List<QuestionBankQuestion> questionBankQuestions);
+
+    /**
+     * 批量从题库移除题目
+     *
+     * @param batchRemove 批量从题库移除题目请求体
+     */
+    void batchRemoveQuestionsFromBank(QuestionBankQuestionBatchRequest batchRemove);
 }

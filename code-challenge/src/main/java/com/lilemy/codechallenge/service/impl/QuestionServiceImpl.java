@@ -12,18 +12,16 @@ import com.lilemy.codechallenge.common.ResultCode;
 import com.lilemy.codechallenge.constant.CommonConstant;
 import com.lilemy.codechallenge.exception.BusinessException;
 import com.lilemy.codechallenge.exception.ThrowUtils;
-import com.lilemy.codechallenge.model.dto.question.QuestionAddRequest;
-import com.lilemy.codechallenge.model.dto.question.QuestionEditRequest;
-import com.lilemy.codechallenge.model.dto.question.QuestionQueryRequest;
-import com.lilemy.codechallenge.model.dto.question.QuestionUpdateRequest;
+import com.lilemy.codechallenge.mapper.QuestionMapper;
+import com.lilemy.codechallenge.model.dto.question.*;
 import com.lilemy.codechallenge.model.entity.Question;
 import com.lilemy.codechallenge.model.entity.QuestionBankQuestion;
 import com.lilemy.codechallenge.model.entity.User;
+import com.lilemy.codechallenge.model.enums.ReviewStatusEnum;
 import com.lilemy.codechallenge.model.vo.QuestionVO;
 import com.lilemy.codechallenge.model.vo.UserVO;
 import com.lilemy.codechallenge.service.QuestionBankQuestionService;
 import com.lilemy.codechallenge.service.QuestionService;
-import com.lilemy.codechallenge.mapper.QuestionMapper;
 import com.lilemy.codechallenge.service.UserService;
 import com.lilemy.codechallenge.util.SqlUtils;
 import jakarta.annotation.Resource;
@@ -31,7 +29,9 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -254,6 +254,61 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
             }
         }
         return new Page<>(current, size);
+    }
+
+    @Override
+    public Page<Question> searchFromEs(QuestionQueryRequest questionQueryRequest) {
+        return null;
+    }
+
+    @Override
+    public boolean reviewQuestion(QuestionReviewRequest questionReviewRequest) {
+        // 查询审核题目信息
+        Long questionId = questionReviewRequest.getId();
+        ThrowUtils.throwIf(questionId <= 0, ResultCode.PARAMS_ERROR);
+        Question question = this.getById(questionId);
+        ThrowUtils.throwIf(question == null, ResultCode.NOT_FOUND_ERROR, "题目不存在");
+        // 获取审核信息
+        Integer reviewStatus = questionReviewRequest.getReviewStatus();
+        String reviewMessage = questionReviewRequest.getReviewMessage();
+        // 如果审核信息为空，则添加默认信息
+        if (StringUtils.isBlank(reviewMessage)) {
+            // 如果审核通过
+            if (reviewStatus == ReviewStatusEnum.PASS.getValue()) {
+                reviewMessage = ReviewStatusEnum.PASS.getText();
+            }
+            // 如果审核不通过
+            if (reviewStatus == ReviewStatusEnum.REJECT.getValue()) {
+                reviewMessage = ReviewStatusEnum.REJECT.getText();
+            }
+        }
+        // 获取审核人信息
+        User loginUser = userService.getLoginUser();
+        Long userId = loginUser.getId();
+        // 获取审核时间
+        question.setReviewTime(new Date());
+        question.setReviewStatus(reviewStatus);
+        question.setReviewMessage(reviewMessage);
+        question.setReviewerId(userId);
+        boolean result = this.updateById(question);
+        ThrowUtils.throwIf(!result, ResultCode.OPERATION_ERROR);
+        return true;
+    }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public boolean batchDeleteQuestions(List<Long> questionIdList) {
+        ThrowUtils.throwIf(CollUtil.isEmpty(questionIdList), ResultCode.PARAMS_ERROR, "删除的题目列表为空");
+        for (Long questionId : questionIdList) {
+            boolean result = this.removeById(questionId);
+            ThrowUtils.throwIf(!result, ResultCode.OPERATION_ERROR, "删除题目失败");
+            // 移除题目题库关系
+            LambdaQueryWrapper<QuestionBankQuestion> lambdaQueryWrapper = Wrappers.lambdaQuery(QuestionBankQuestion.class)
+                    .eq(QuestionBankQuestion::getQuestionId, questionId);
+            result = questionBankQuestionService.remove(lambdaQueryWrapper);
+            ThrowUtils.throwIf(!result, ResultCode.OPERATION_ERROR, "删除题目题库关联失败");
+        }
+        return true;
     }
 
 }
