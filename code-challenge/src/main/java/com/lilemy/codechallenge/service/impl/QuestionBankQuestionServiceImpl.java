@@ -57,6 +57,7 @@ public class QuestionBankQuestionServiceImpl extends ServiceImpl<QuestionBankQue
     private QuestionService questionService;
 
     @Resource
+    @Lazy
     private QuestionBankService questionBankService;
 
     @Resource

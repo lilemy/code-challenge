@@ -192,6 +192,12 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
     }
 
     @Override
+    public QueryWrapper<Question> getReviewQueryWrapper(QuestionQueryRequest questionQueryRequest) {
+        QueryWrapper<Question> queryWrapper = this.getQueryWrapper(questionQueryRequest);
+        return queryWrapper.eq("review_status", ReviewStatusEnum.PASS.getValue());
+    }
+
+    @Override
     public QuestionVO getQuestionVO(Question question) {
         // 对象转封装类
         QuestionVO questionVO = QuestionVO.objToVo(question);
@@ -229,7 +235,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
     }
 
     @Override
-    public Page<Question> listQuestionByPage(QuestionQueryRequest questionQueryRequest) {
+    public Page<Question> listQuestionByPage(QuestionQueryRequest questionQueryRequest, Boolean isIncludeNoPass) {
         long current = questionQueryRequest.getCurrent();
         long size = questionQueryRequest.getPageSize();
         // 题目表的查询条件
@@ -249,6 +255,9 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
                         .collect(Collectors.toSet());
                 // 复用原有题目表的查询条件
                 queryWrapper.in("id", questionIdSet);
+                if (!isIncludeNoPass) {
+                    queryWrapper.eq("review_status", ReviewStatusEnum.PASS.getValue());
+                }
                 // 查询数据库
                 return this.page(new Page<>(current, size), queryWrapper);
             }

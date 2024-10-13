@@ -79,7 +79,7 @@ public class QuestionBankController {
         if (isNeedQueryQuestionList) {
             QuestionQueryRequest questionQueryRequest = new QuestionQueryRequest();
             questionQueryRequest.setQuestionBankId(id);
-            Page<Question> questionPage = questionService.listQuestionByPage(questionQueryRequest);
+            Page<Question> questionPage = questionService.listQuestionByPage(questionQueryRequest, false);
             Page<QuestionVO> questionVOPage = questionService.getQuestionVOPage(questionPage);
             questionBankVO.setQuestionPage(questionVOPage);
         }

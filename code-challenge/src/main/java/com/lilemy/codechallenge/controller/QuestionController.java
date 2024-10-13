@@ -7,10 +7,12 @@ import com.lilemy.codechallenge.common.DeleteRequest;
 import com.lilemy.codechallenge.common.ResultCode;
 import com.lilemy.codechallenge.common.ResultUtils;
 import com.lilemy.codechallenge.constant.UserConstant;
+import com.lilemy.codechallenge.exception.BusinessException;
 import com.lilemy.codechallenge.exception.ThrowUtils;
 import com.lilemy.codechallenge.model.dto.question.*;
 import com.lilemy.codechallenge.model.entity.Question;
 import com.lilemy.codechallenge.model.entity.User;
+import com.lilemy.codechallenge.model.enums.ReviewStatusEnum;
 import com.lilemy.codechallenge.model.vo.QuestionVO;
 import com.lilemy.codechallenge.service.QuestionService;
 import com.lilemy.codechallenge.service.UserService;
@@ -86,6 +88,16 @@ public class QuestionController {
         // 查询数据库
         Question question = questionService.getById(id);
         ThrowUtils.throwIf(question == null, ResultCode.NOT_FOUND_ERROR);
+        Integer reviewStatus = question.getReviewStatus();
+        Long userId = question.getUserId();
+        // 如果题目未通过审核，则只能创建用户
+        if (reviewStatus != ReviewStatusEnum.PASS.getValue()) {
+            User loginUser = userService.getLoginUser();
+            Long loginUserId = loginUser.getId();
+            if (!userId.equals(loginUserId) && !userService.isAdmin()) {
+                throw new BusinessException(ResultCode.NO_AUTH_ERROR);
+            }
+        }
         // 获取封装类
         return ResultUtils.success(questionService.getQuestionVO(question));
     }
@@ -113,7 +125,7 @@ public class QuestionController {
         ThrowUtils.throwIf(size > 20, ResultCode.PARAMS_ERROR);
         // 查询数据库
         Page<Question> questionPage = questionService.page(new Page<>(current, size),
-                questionService.getQueryWrapper(questionQueryRequest));
+                questionService.getReviewQueryWrapper(questionQueryRequest));
         // 获取封装类
         return ResultUtils.success(questionService.getQuestionVOPage(questionPage));
     }

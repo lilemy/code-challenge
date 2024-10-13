@@ -2,21 +2,25 @@ package com.lilemy.codechallenge.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lilemy.codechallenge.common.ResultCode;
 import com.lilemy.codechallenge.constant.CommonConstant;
 import com.lilemy.codechallenge.exception.ThrowUtils;
+import com.lilemy.codechallenge.mapper.QuestionBankMapper;
 import com.lilemy.codechallenge.model.dto.questionbank.QuestionBankAddRequest;
 import com.lilemy.codechallenge.model.dto.questionbank.QuestionBankQueryRequest;
 import com.lilemy.codechallenge.model.dto.questionbank.QuestionBankUpdateRequest;
 import com.lilemy.codechallenge.model.entity.QuestionBank;
+import com.lilemy.codechallenge.model.entity.QuestionBankQuestion;
 import com.lilemy.codechallenge.model.entity.User;
 import com.lilemy.codechallenge.model.vo.QuestionBankVO;
 import com.lilemy.codechallenge.model.vo.UserVO;
+import com.lilemy.codechallenge.service.QuestionBankQuestionService;
 import com.lilemy.codechallenge.service.QuestionBankService;
-import com.lilemy.codechallenge.mapper.QuestionBankMapper;
 import com.lilemy.codechallenge.service.UserService;
 import com.lilemy.codechallenge.util.SqlUtils;
 import jakarta.annotation.Resource;
@@ -24,6 +28,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -40,6 +45,9 @@ public class QuestionBankServiceImpl extends ServiceImpl<QuestionBankMapper, Que
 
     @Resource
     private UserService userService;
+
+    @Resource
+    private QuestionBankQuestionService questionBankQuestionService;
 
     @Override
     public void validQuestionBank(QuestionBank questionBank, boolean add) {
@@ -72,8 +80,16 @@ public class QuestionBankServiceImpl extends ServiceImpl<QuestionBankMapper, Que
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public Boolean deleteQuestionBank(Long id) {
-        // 操作数据库
+        // 删除关联题目
+        LambdaQueryWrapper<QuestionBankQuestion> lambdaQueryWrapper = Wrappers.lambdaQuery(QuestionBankQuestion.class)
+                .eq(QuestionBankQuestion::getQuestionBankId, id);
+        List<QuestionBankQuestion> questionBankQuestions = questionBankQuestionService.list(lambdaQueryWrapper);
+        if (CollUtil.isNotEmpty(questionBankQuestions)) {
+            questionBankQuestionService.removeBatchByIds(questionBankQuestions);
+        }
+        // 操作数据库，删除题库
         boolean result = this.removeById(id);
         ThrowUtils.throwIf(!result, ResultCode.OPERATION_ERROR);
         return true;

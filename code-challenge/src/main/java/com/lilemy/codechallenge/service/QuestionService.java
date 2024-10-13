@@ -64,6 +64,14 @@ public interface QuestionService extends IService<Question> {
     QueryWrapper<Question> getQueryWrapper(QuestionQueryRequest questionQueryRequest);
 
     /**
+     * 获取查询条件（已审核）
+     *
+     * @param questionQueryRequest 题目查询请求体
+     * @return 题目查询条件
+     */
+    QueryWrapper<Question> getReviewQueryWrapper(QuestionQueryRequest questionQueryRequest);
+
+    /**
      * 获取题目封装
      *
      * @param question 题目信息
@@ -83,9 +91,10 @@ public interface QuestionService extends IService<Question> {
      * 分页获取题目列表
      *
      * @param questionQueryRequest 题目查询请求体
+     * @param isIncludeNoPass      是否包含未审核通过的
      * @return 题目分页列表
      */
-    Page<Question> listQuestionByPage(QuestionQueryRequest questionQueryRequest);
+    Page<Question> listQuestionByPage(QuestionQueryRequest questionQueryRequest, Boolean isIncludeNoPass);
 
     /**
      * Es 搜索分页获取题目列表
