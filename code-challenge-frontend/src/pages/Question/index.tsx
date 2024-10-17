@@ -34,7 +34,7 @@ const Question: React.FC = () => {
   return (
     <div className="max-width-content" style={{ width: '100%' }}>
       <Title level={3}>题目大全</Title>
-      <ProTable<API.Question, API.PageQuestion>
+      <ProTable<API.QuestionVO, API.PageQuestionVO>
         actionRef={actionRef}
         rowKey="id"
         search={{

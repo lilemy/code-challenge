@@ -2,7 +2,14 @@ export default [
   {
     path: '/user',
     layout: false,
-    routes: [{ name: '登录', path: '/user/login', component: './User/Login' }],
+    routes: [
+      { name: '登录', path: '/user/login', component: './User/Login' },
+      {
+        name: '注册',
+        path: '/user/register',
+        component: './User/Register',
+      },
+    ],
   },
   { path: '/welcome', name: '欢迎', icon: 'smile', component: './Welcome' },
   { path: '/banks', name: '题库', icon: 'table', component: './Bank' },
@@ -41,6 +48,12 @@ export default [
       { path: '/admin/users', name: '用户管理', component: './Admin/User' },
       { path: '/admin/banks', name: '题库管理', component: './Admin/QuestionBank' },
       { path: '/admin/questions', name: '题目管理', component: './Admin/Question' },
+      {
+        path: '/admin/review/questions',
+        name: '题目审核',
+        component: './Admin/Review/Question',
+        hideInMenu: true,
+      },
     ],
   },
   { path: '/', redirect: '/welcome' },

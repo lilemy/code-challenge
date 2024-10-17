@@ -26,6 +26,21 @@ export async function deleteQuestion(body: API.DeleteRequest, options?: { [key: 
   });
 }
 
+/** 批量删除题目 POST /question/delete/batch */
+export async function deleteQuestionBatch(
+  body: API.QuestionBatchDeleteRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseBoolean>('/question/delete/batch', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** 编辑题目 POST /question/edit */
 export async function editQuestion(
   body: API.QuestionEditRequest,
@@ -86,12 +101,42 @@ export async function listMyQuestionVoByPage(
   });
 }
 
+/** 分页获取未审核题目列表 POST /question/list/reviewing */
+export async function listReviewingQuestionByPage(
+  body: API.QuestionQueryRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponsePageQuestion>('/question/list/reviewing', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
 /** 分页获取题目列表（封装类） POST /question/list/vo */
 export async function listQuestionVoByPage(
   body: API.QuestionQueryRequest,
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResponsePageQuestionVO>('/question/list/vo', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** 审核题目 POST /question/review */
+export async function reviewQuestion(
+  body: API.QuestionReviewRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseBoolean>('/question/review', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

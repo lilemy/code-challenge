@@ -306,6 +306,11 @@ declare namespace API {
     questionId?: number;
   };
 
+  type QuestionBankQuestionBatchRequest = {
+    questionBankId?: number;
+    questionIdList?: number[];
+  };
+
   type QuestionBankQuestionQueryRequest = {
     current?: number;
     pageSize?: number;
@@ -360,6 +365,10 @@ declare namespace API {
     questionPage?: PageQuestionVO;
   };
 
+  type QuestionBatchDeleteRequest = {
+    questionIdList?: number[];
+  };
+
   type QuestionEditRequest = {
     id?: number;
     title?: string;
@@ -382,6 +391,12 @@ declare namespace API {
     answer?: string;
     questionBankId?: number;
     userId?: number;
+  };
+
+  type QuestionReviewRequest = {
+    id?: number;
+    reviewStatus?: number;
+    reviewMessage?: string;
   };
 
   type QuestionUpdateRequest = {
@@ -427,6 +442,13 @@ declare namespace API {
     userAccount?: string;
     userRole?: string;
     username?: string;
+  };
+
+  type UserEditRequest = {
+    id?: number;
+    username?: string;
+    userAvatar?: string;
+    userProfile?: string;
   };
 
   type UserLoginRequest = {

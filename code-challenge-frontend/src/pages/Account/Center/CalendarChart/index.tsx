@@ -20,7 +20,6 @@ const CalendarChart: React.FC = () => {
     const dateStr = dayjs(`${year}-01-01`)
       .add(dayOfYear - 1, 'day')
       .format('YYYY-MM-DD');
-    console.log(dateStr);
     return [dateStr, 1];
   });
 

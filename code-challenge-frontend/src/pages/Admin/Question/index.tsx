@@ -4,7 +4,8 @@ import CreateForm from '@/pages/Admin/Question/components/CreateForm';
 import UpdateBankModal from '@/pages/Admin/Question/components/UpdateBankModal';
 import UpdateForm from '@/pages/Admin/Question/components/UpdateForm';
 import { deleteQuestion, listQuestionByPage } from '@/services/code-challenge/questionController';
-import { PlusOutlined } from '@ant-design/icons';
+import { Link } from '@@/exports';
+import { EditOutlined, PlusOutlined } from '@ant-design/icons';
 import { type ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Button, message, Space, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
@@ -176,13 +177,18 @@ const QuestionTableList: React.FC = () => {
         toolBarRender={() => [
           <Button
             type="primary"
-            key="primary"
+            key="add"
             onClick={() => {
               setCreateModalVisible(true);
             }}
           >
             <PlusOutlined /> 新建
           </Button>,
+          <Link key="review" to="/admin/review/questions">
+            <Button type="primary">
+              <EditOutlined /> 审核
+            </Button>
+          </Link>,
         ]}
         request={async (params, sort, filter) => {
           const sortField = Object.keys(sort)?.[0];
