@@ -2,6 +2,7 @@ package com.lilemy.codechallenge.service;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.lilemy.codechallenge.model.dto.user.UserEditRequest;
 import com.lilemy.codechallenge.model.dto.user.UserQueryRequest;
 import com.lilemy.codechallenge.model.entity.User;
 import com.lilemy.codechallenge.model.vo.LoginUserVO;
@@ -33,6 +34,14 @@ public interface UserService extends IService<User> {
      * @return 用户信息（脱敏）
      */
     LoginUserVO userLogin(String userAccount, String userPassword);
+
+    /**
+     * 用户编辑
+     *
+     * @param userEditRequest 用户编辑请求体
+     * @return 是否操作成功
+     */
+    boolean userEdit(UserEditRequest userEditRequest);
 
     /**
      * 用户注销

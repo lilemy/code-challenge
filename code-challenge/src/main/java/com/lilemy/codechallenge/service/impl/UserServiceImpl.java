@@ -14,6 +14,7 @@ import com.lilemy.codechallenge.constant.UserConstant;
 import com.lilemy.codechallenge.exception.BusinessException;
 import com.lilemy.codechallenge.exception.ThrowUtils;
 import com.lilemy.codechallenge.mapper.UserMapper;
+import com.lilemy.codechallenge.model.dto.user.UserEditRequest;
 import com.lilemy.codechallenge.model.dto.user.UserQueryRequest;
 import com.lilemy.codechallenge.model.entity.User;
 import com.lilemy.codechallenge.model.vo.LoginUserVO;
@@ -32,6 +33,7 @@ import java.time.LocalDate;
 import java.time.Year;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -123,6 +125,25 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
+    public boolean userEdit(UserEditRequest userEditRequest) {
+        Long id = userEditRequest.getId();
+        String username = userEditRequest.getUsername();
+        String userAvatar = userEditRequest.getUserAvatar();
+        String userProfile = userEditRequest.getUserProfile();
+        User loginUser = this.getLoginUser();
+        ThrowUtils.throwIf(!id.equals(loginUser.getId()), ResultCode.NO_AUTH_ERROR);
+        User user = new User();
+        user.setId(id);
+        user.setUsername(username);
+        user.setUserAvatar(userAvatar);
+        user.setUserProfile(userProfile);
+        user.setEditTime(new Date());
+        boolean result = this.updateById(user);
+        ThrowUtils.throwIf(!result, ResultCode.OPERATION_ERROR);
+        return true;
+    }
+
+    @Override
     public boolean userLogout() {
         if (!StpUtil.isLogin() || StpUtil.getTokenSession().get(UserConstant.USER_LOGIN_STATE) == null) {
             throw new BusinessException(ResultCode.OPERATION_ERROR, "未登录");
@@ -208,7 +229,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         // 检查当天是否已经签到
         if (!signInBitSet.get(offset)) {
             // 如果当前还未签到，则设置签到
-            return signInBitSet.set(offset, true);
+            try {
+                signInBitSet.set(offset, true);
+            } catch (Exception e) {
+                throw new BusinessException(ResultCode.OPERATION_ERROR);
+            }
+            return true;
         }
         // 当天已签到
         return true;

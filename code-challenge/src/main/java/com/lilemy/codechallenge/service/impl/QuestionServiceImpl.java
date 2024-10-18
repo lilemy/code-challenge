@@ -71,6 +71,38 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Long createQuestion(QuestionCreateRequest questionCreateRequest) {
+        Question question = new Question();
+        BeanUtils.copyProperties(questionCreateRequest, question);
+        List<String> tags = questionCreateRequest.getTags();
+        if (tags != null) {
+            question.setTags(JSONUtil.toJsonStr(tags));
+        }
+        // 填充默认值
+        User loginUser = userService.getLoginUser();
+        question.setUserId(loginUser.getId());
+        // 数据校验
+        this.validQuestion(question, true);
+        // 写入数据库
+        boolean result = this.save(question);
+        ThrowUtils.throwIf(!result, ResultCode.OPERATION_ERROR);
+        // 添加题目题库关联
+        List<Long> questionBankIds = questionCreateRequest.getQuestionBankIds();
+        if (CollUtil.isNotEmpty(questionBankIds)) {
+            for (Long questionBankId : questionBankIds) {
+                QuestionBankQuestion questionBankQuestion = new QuestionBankQuestion();
+                questionBankQuestion.setQuestionId(question.getId());
+                questionBankQuestion.setQuestionBankId(questionBankId);
+                questionBankQuestion.setUserId(loginUser.getId());
+                boolean save = questionBankQuestionService.save(questionBankQuestion);
+                ThrowUtils.throwIf(!save, ResultCode.OPERATION_ERROR);
+            }
+        }
+        return question.getId();
+    }
+
+    @Override
     public Long addQuestion(QuestionAddRequest questionAddRequest) {
         Question question = new Question();
         BeanUtils.copyProperties(questionAddRequest, question);
@@ -107,24 +139,25 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
 
     @Override
     public boolean editQuestion(QuestionEditRequest questionEditRequest) {
+        // 判断是否存在
+        Long id = questionEditRequest.getId();
+        Question oldQuestion = this.getById(id);
+        ThrowUtils.throwIf(oldQuestion == null, ResultCode.NOT_FOUND_ERROR);
+        User loginUser = userService.getLoginUser();
+        // 仅本人可删除
+        ThrowUtils.throwIf(!oldQuestion.getUserId().equals(loginUser.getId()), ResultCode.NO_AUTH_ERROR);
         Question question = new Question();
         BeanUtils.copyProperties(questionEditRequest, question);
         List<String> tags = questionEditRequest.getTags();
         if (tags != null) {
             question.setTags(JSONUtil.toJsonStr(tags));
         }
-        User loginUser = userService.getLoginUser();
+        question.setEditTime(new Date());
         // 数据校验
         this.validQuestion(question, false);
-        // 判断是否存在
-        Long id = questionEditRequest.getId();
-        Question oldQuestion = this.getById(id);
-        ThrowUtils.throwIf(oldQuestion == null, ResultCode.NOT_FOUND_ERROR);
-        // 仅本人或管理员可删除
-        if (!oldQuestion.getUserId().equals(loginUser.getId()) && !userService.isAdmin()) {
-            throw new BusinessException(ResultCode.NO_AUTH_ERROR);
-        }
-        return false;
+        boolean result = this.updateById(question);
+        ThrowUtils.throwIf(!result, ResultCode.OPERATION_ERROR);
+        return true;
     }
 
     @Override

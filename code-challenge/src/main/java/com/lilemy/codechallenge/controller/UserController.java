@@ -1,6 +1,7 @@
 package com.lilemy.codechallenge.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lilemy.codechallenge.annotation.AuthCheck;
 import com.lilemy.codechallenge.common.BaseResponse;
 import com.lilemy.codechallenge.common.DeleteRequest;
 import com.lilemy.codechallenge.common.ResultCode;
@@ -86,11 +87,9 @@ public class UserController {
 
     @Operation(summary = "创建用户")
     @PostMapping("/add")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Long> addUser(@RequestBody UserAddRequest userAddRequest) {
-        ThrowUtils.throwIf(!userService.isAdmin(), ResultCode.NO_AUTH_ERROR);
-        if (userAddRequest == null) {
-            throw new BusinessException(ResultCode.PARAMS_ERROR);
-        }
+        ThrowUtils.throwIf(userAddRequest == null, ResultCode.PARAMS_ERROR);
         User user = new User();
         BeanUtils.copyProperties(userAddRequest, user);
         // 默认密码 123456
@@ -104,27 +103,31 @@ public class UserController {
 
     @Operation(summary = "删除用户")
     @PostMapping("/delete")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest) {
-        ThrowUtils.throwIf(!userService.isAdmin(), ResultCode.NO_AUTH_ERROR);
-        if (deleteRequest == null || deleteRequest.getId() <= 0) {
-            throw new BusinessException(ResultCode.PARAMS_ERROR);
-        }
+        ThrowUtils.throwIf(deleteRequest == null || deleteRequest.getId() <= 0, ResultCode.PARAMS_ERROR);
         boolean b = userService.removeById(deleteRequest.getId());
         return ResultUtils.success(b);
     }
 
     @Operation(summary = "更新用户")
     @PostMapping("/update")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
-        ThrowUtils.throwIf(!userService.isAdmin(), ResultCode.NO_AUTH_ERROR);
-        if (userUpdateRequest == null || userUpdateRequest.getId() == null) {
-            throw new BusinessException(ResultCode.PARAMS_ERROR);
-        }
+        ThrowUtils.throwIf(userUpdateRequest == null || userUpdateRequest.getId() == null, ResultCode.PARAMS_ERROR);
         User user = new User();
         BeanUtils.copyProperties(userUpdateRequest, user);
         boolean result = userService.updateById(user);
         ThrowUtils.throwIf(!result, ResultCode.OPERATION_ERROR);
         return ResultUtils.success(true);
+    }
+
+    @Operation(summary = "用户编辑")
+    @PostMapping("/edit")
+    public BaseResponse<Boolean> userEdit(@RequestBody UserEditRequest userEditRequest) {
+        ThrowUtils.throwIf(userEditRequest == null || userEditRequest.getId() == null, ResultCode.PARAMS_ERROR);
+        boolean result = userService.userEdit(userEditRequest);
+        return ResultUtils.success(result);
     }
 
     // endregion

@@ -26,6 +26,14 @@ public interface QuestionService extends IService<Question> {
     /**
      * 创建题目
      *
+     * @param questionCreateRequest 创建题目请求
+     * @return 创建的题目 id
+     */
+    Long createQuestion(QuestionCreateRequest questionCreateRequest);
+
+    /**
+     * 创建题目（管理员）
+     *
      * @param questionAddRequest 题目创建请求
      * @return 创建题目 id
      */

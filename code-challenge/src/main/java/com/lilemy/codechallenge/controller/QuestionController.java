@@ -1,5 +1,6 @@
 package com.lilemy.codechallenge.controller;
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lilemy.codechallenge.annotation.AuthCheck;
 import com.lilemy.codechallenge.common.BaseResponse;
@@ -37,6 +38,14 @@ public class QuestionController {
     // region 题目增删改查
 
     @Operation(summary = "创建题目")
+    @PostMapping("/create")
+    public BaseResponse<Long> createQuestion(@RequestBody QuestionCreateRequest questionCreateRequest) {
+        ThrowUtils.throwIf(questionCreateRequest == null, ResultCode.PARAMS_ERROR);
+        Long questionId = questionService.createQuestion(questionCreateRequest);
+        return ResultUtils.success(questionId);
+    }
+
+    @Operation(summary = "创建题目（管理员）")
     @PostMapping("/add")
     public BaseResponse<Long> addQuestion(@RequestBody QuestionAddRequest questionAddRequest) {
         ThrowUtils.throwIf(questionAddRequest == null, ResultCode.PARAMS_ERROR);
@@ -56,6 +65,7 @@ public class QuestionController {
 
     @Operation(summary = "批量删除题目")
     @PostMapping("/delete/batch")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteQuestionBatch(@RequestBody QuestionBatchDeleteRequest questionBatchDeleteRequest) {
         ThrowUtils.throwIf(questionBatchDeleteRequest == null, ResultCode.PARAMS_ERROR);
         boolean result = questionService.batchDeleteQuestions(questionBatchDeleteRequest.getQuestionIdList());
@@ -112,6 +122,21 @@ public class QuestionController {
         // 查询数据库
         Page<Question> questionPage = questionService.page(new Page<>(current, size),
                 questionService.getQueryWrapper(questionQueryRequest));
+        return ResultUtils.success(questionPage);
+    }
+
+    @Operation(summary = "分页获取未审核题目列表")
+    @PostMapping("/list/reviewing")
+    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    public BaseResponse<Page<Question>> listReviewingQuestionByPage(@RequestBody QuestionQueryRequest questionQueryRequest) {
+        ThrowUtils.throwIf(questionQueryRequest == null, ResultCode.PARAMS_ERROR);
+        long current = questionQueryRequest.getCurrent();
+        long size = questionQueryRequest.getPageSize();
+        QueryWrapper<Question> queryWrapper = questionService.getQueryWrapper(questionQueryRequest);
+        // 添加查询条件
+        queryWrapper.eq("review_status", ReviewStatusEnum.REVIEWING.getValue());
+        // 查询数据库
+        Page<Question> questionPage = questionService.page(new Page<>(current, size), queryWrapper);
         return ResultUtils.success(questionPage);
     }
 
