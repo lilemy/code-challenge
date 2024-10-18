@@ -32,6 +32,14 @@ export async function deleteQuestionBank(
   });
 }
 
+/** 获取题库列表信息 GET /questionBank/get/list */
+export async function getQuestionBankList(options?: { [key: string]: any }) {
+  return request<API.BaseResponseListQuestionBankListVO>('/questionBank/get/list', {
+    method: 'GET',
+    ...(options || {}),
+  });
+}
+
 /** 根据id获取题库脱敏信息 GET /questionBank/get/vo */
 export async function getQuestionBankVoById(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)

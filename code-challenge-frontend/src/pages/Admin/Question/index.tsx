@@ -68,12 +68,9 @@ const QuestionTableList: React.FC = () => {
       valueType: 'text',
       hideInSearch: true,
       width: 640,
-      // @ts-ignore
-      renderFormItem: (_, { fieldProps }, form) => {
-        // 编写要渲染的表单项
-        console.log(form);
+      renderFormItem: (_, { value }) => {
         // value 和 onchange 会通过 form 自动注入
-        return <MdEditor {...fieldProps} />;
+        return <MdEditor {...value} />;
       },
     },
     {
@@ -82,12 +79,9 @@ const QuestionTableList: React.FC = () => {
       valueType: 'text',
       hideInSearch: true,
       width: 640,
-      // @ts-ignore
-      renderFormItem: (_, { fieldProps }, form) => {
-        // 编写要渲染的表单项
-        console.log(form);
+      renderFormItem: (_, { value }) => {
         // value 和 onchange 会通过 form 自动注入
-        return <MdEditor {...fieldProps} />;
+        return <MdEditor {...value} />;
       },
     },
     {
@@ -102,7 +96,6 @@ const QuestionTableList: React.FC = () => {
         return <TagList tagList={tagList} />;
       },
     },
-
     {
       title: '创建用户',
       dataIndex: 'userId',

@@ -2,6 +2,7 @@ import TagList from '@/components/TagList';
 import { listQuestionVoByPage } from '@/services/code-challenge/questionController';
 import { Link } from '@@/exports';
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
+import { Button, Card, Col, Row } from 'antd';
 import Title from 'antd/es/typography/Title';
 import React, { useRef } from 'react';
 
@@ -33,7 +34,20 @@ const Question: React.FC = () => {
   ];
   return (
     <div className="max-width-content" style={{ width: '100%' }}>
-      <Title level={3}>题目大全</Title>
+      <Card style={{ marginBottom: 15 }}>
+        <Row>
+          <Col flex="auto">
+            <Title level={3}>题目大全</Title>
+          </Col>
+          <Col>
+            <Link to="/question/create">
+              <Button type="primary" size={'large'}>
+                新建题目
+              </Button>
+            </Link>
+          </Col>
+        </Row>
+      </Card>
       <ProTable<API.QuestionVO, API.PageQuestionVO>
         actionRef={actionRef}
         rowKey="id"

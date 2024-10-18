@@ -14,7 +14,7 @@ const Settings: ProLayoutProps & {
   fixedHeader: false,
   fixSiderbar: true,
   colorWeak: false,
-  title: '小新面试刷题平台',
+  title: '小新刷题平台',
   pwa: true,
   iconfontUrl: '',
 };

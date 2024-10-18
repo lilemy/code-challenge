@@ -14,7 +14,7 @@ const Footer: React.FC = () => {
       links={[
         {
           key: 'code-challenge',
-          title: '小新面试刷题平台',
+          title: '小新刷题平台',
           href: 'https://github.com/lilemy/code-challenge',
           blankTarget: true,
         },

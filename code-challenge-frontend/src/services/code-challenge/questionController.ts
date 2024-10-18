@@ -2,9 +2,24 @@
 /* eslint-disable */
 import { request } from '@umijs/max';
 
-/** 创建题目 POST /question/add */
+/** 创建题目（管理员） POST /question/add */
 export async function addQuestion(body: API.QuestionAddRequest, options?: { [key: string]: any }) {
   return request<API.BaseResponseLong>('/question/add', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** 创建题目 POST /question/create */
+export async function createQuestion(
+  body: API.QuestionCreateRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseLong>('/question/create', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

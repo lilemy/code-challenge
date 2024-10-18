@@ -11,6 +11,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseListQuestionBankListVO = {
+    code?: number;
+    data?: QuestionBankListVO[];
+    message?: string;
+  };
+
   type BaseResponseLoginUserVO = {
     code?: number;
     data?: LoginUserVO;
@@ -286,6 +292,12 @@ declare namespace API {
     picture?: string;
   };
 
+  type QuestionBankListVO = {
+    id?: number;
+    title?: string;
+    description?: string;
+  };
+
   type QuestionBankQueryRequest = {
     current?: number;
     pageSize?: number;
@@ -367,6 +379,14 @@ declare namespace API {
 
   type QuestionBatchDeleteRequest = {
     questionIdList?: number[];
+  };
+
+  type QuestionCreateRequest = {
+    title?: string;
+    questionBankId?: number;
+    content?: string;
+    tags?: string[];
+    answer?: string;
   };
 
   type QuestionEditRequest = {
