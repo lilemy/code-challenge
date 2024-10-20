@@ -74,14 +74,18 @@ const QuestionCreate: React.FC = () => {
           }}
           formRef={formRef}
         >
-          <ProFormText label="题目标题" name="title" rules={[{ required: true }]} />
+          <ProFormText
+            label="题目标题："
+            name="title"
+            rules={[{ required: true, message: '请输入题目标题' }]}
+          />
           <ProFormSelect
             name="questionBankIds"
             label="所属题库"
             mode="multiple"
             options={questionBankListForm}
           />
-          <ProFormText label="题目内容" name="content" rules={[{ required: true }]}>
+          <ProFormText label="题目内容：" name="content">
             <MdEditor
               value={contentMd}
               onChange={(value) => {
@@ -90,7 +94,11 @@ const QuestionCreate: React.FC = () => {
               }}
             />
           </ProFormText>
-          <ProFormText label="推荐答案" name="answer" rules={[{ required: true }]}>
+          <ProFormText
+            label="推荐答案："
+            name="answer"
+            rules={[{ required: true, message: '请输入题目推荐答案' }]}
+          >
             <MdEditor
               value={answerMd}
               onChange={(value) => {
@@ -99,7 +107,7 @@ const QuestionCreate: React.FC = () => {
               }}
             />
           </ProFormText>
-          <ProForm.Item label="题目标签" name="tags">
+          <ProForm.Item label="题目标签：" name="tags">
             {tags.map((tag) => (
               <Tag
                 onChange={() => formRef.current?.setFieldsValue({ tags: tags })}

@@ -1,6 +1,6 @@
-﻿import type { RequestOptions } from '@@/plugin-request/request';
+﻿import { BACKEND_HOST_DEV, BACKEND_HOST_PROD } from '@/constants';
+import type { RequestOptions } from '@@/plugin-request/request';
 import type { RequestConfig } from '@umijs/max';
-import { BACKEND_HOST_DEV, BACKEND_HOST_PROD } from '@/constants';
 
 const isDev = process.env.NODE_ENV === 'development';
 
@@ -37,6 +37,7 @@ export const requestConfig: RequestConfig = {
       if (
         code === 40100 &&
         !requestPath.includes('user/get/login') &&
+        !requestPath.includes('user/add/sign_in') &&
         !location.pathname.includes('/user/login')
       ) {
         // 跳转至登录页

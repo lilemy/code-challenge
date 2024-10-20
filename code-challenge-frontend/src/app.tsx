@@ -1,10 +1,9 @@
-import { Footer, AvatarDropdown } from '@/components';
+import { AvatarDropdown, Footer } from '@/components';
+import { getLoginUser } from '@/services/code-challenge/userController';
 import type { RunTimeLayoutConfig } from '@umijs/max';
 import { history } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
 import { requestConfig } from './requestConfig';
-import React from 'react';
-import { getLoginUser } from '@/services/code-challenge/userController';
 
 const loginPath = '/user/login';
 

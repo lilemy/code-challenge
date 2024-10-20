@@ -1,5 +1,4 @@
 import { addUserSignIn } from '@/services/code-challenge/userController';
-import { message } from 'antd';
 import { useEffect, useState } from 'react';
 
 /**
@@ -15,9 +14,7 @@ const useAddUserSignInRecord = () => {
     setLoading(true);
     try {
       await addUserSignIn({});
-    } catch (e: any) {
-      message.error('获取刷题签到记录失败，' + e.message);
-    }
+    } catch (e: any) {}
     setLoading(false);
   };
 

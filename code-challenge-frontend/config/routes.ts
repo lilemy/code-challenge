@@ -45,6 +45,12 @@ export default [
     hideInMenu: true,
   },
   {
+    path: 'account/setting',
+    name: '个人设置',
+    component: './Account/Setting',
+    hideInMenu: true,
+  },
+  {
     path: '/admin',
     name: '管理页',
     icon: 'crown',
