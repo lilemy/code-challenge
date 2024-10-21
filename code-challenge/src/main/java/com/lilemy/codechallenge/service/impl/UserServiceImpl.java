@@ -20,8 +20,10 @@ import com.lilemy.codechallenge.model.entity.User;
 import com.lilemy.codechallenge.model.vo.LoginUserVO;
 import com.lilemy.codechallenge.model.vo.UserVO;
 import com.lilemy.codechallenge.service.UserService;
+import com.lilemy.codechallenge.util.DeviceUtils;
 import com.lilemy.codechallenge.util.SqlUtils;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.redisson.api.RBitSet;
 import org.redisson.api.RedissonClient;
@@ -94,7 +96,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
     }
 
     @Override
-    public LoginUserVO userLogin(String userAccount, String userPassword) {
+    public LoginUserVO userLogin(String userAccount, String userPassword, HttpServletRequest request) {
         // 参数校验
         if (StringUtils.isAnyBlank(userAccount, userPassword)) {
             throw new BusinessException(ResultCode.PARAMS_ERROR, "参数为空");
@@ -118,8 +120,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         if (!encryptPassword.equals(user.getUserPassword())) {
             throw new BusinessException(ResultCode.PARAMS_ERROR, "密码错误");
         }
-        // 记录用户的登录态
-        StpUtil.login(user.getId());
+        // 记录用户的登录态，指定设备，同端登录互斥
+        StpUtil.login(user.getId(), DeviceUtils.getRequestDevice(request));
         StpUtil.getTokenSession().set(UserConstant.USER_LOGIN_STATE, user);
         return this.getLoginUserVO(user);
     }
@@ -140,14 +142,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setEditTime(new Date());
         boolean result = this.updateById(user);
         ThrowUtils.throwIf(!result, ResultCode.OPERATION_ERROR);
+        // 记录用户的登录态
+        StpUtil.login(user.getId());
+        StpUtil.getTokenSession().set(UserConstant.USER_LOGIN_STATE, user);
         return true;
     }
 
     @Override
     public boolean userLogout() {
-        if (!StpUtil.isLogin() || StpUtil.getTokenSession().get(UserConstant.USER_LOGIN_STATE) == null) {
-            throw new BusinessException(ResultCode.OPERATION_ERROR, "未登录");
-        }
+        StpUtil.checkLogin();
         // 移除登录态
         StpUtil.logout();
         return true;
@@ -176,6 +179,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         loginUserVO.setUserAvatar(user.getUserAvatar());
         loginUserVO.setUserProfile(user.getUserProfile());
         loginUserVO.setUserRole(user.getUserRole());
+        loginUserVO.setEditTime(user.getEditTime());
         loginUserVO.setUpdateTime(user.getUpdateTime());
         loginUserVO.setCreateTime(user.getCreateTime());
         return loginUserVO;

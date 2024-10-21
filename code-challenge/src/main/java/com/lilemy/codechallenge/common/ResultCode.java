@@ -8,6 +8,7 @@ public enum ResultCode {
     PARAMS_ERROR(40000, "请求参数错误"),
     NOT_LOGIN_ERROR(40100, "未登录"),
     NO_AUTH_ERROR(40101, "无权限"),
+    FREQUENT_ERROR(40110, "请求频繁"),
     NOT_FOUND_ERROR(40400, "请求数据不存在"),
     FORBIDDEN_ERROR(40300, "禁止访问"),
     SYSTEM_ERROR(50000, "系统内部异常"),

@@ -10,3 +10,7 @@ server:
   port: 8080
   servlet:
     context-path: /api
+# Sa-Token 配置 (文档: https://sa-token.cc)
+sa-token:
+  # 是否允许同一账号多地同时登录 （为 true 时允许一起登录, 为 false 时新登录挤掉旧登录）
+  is-concurrent: false

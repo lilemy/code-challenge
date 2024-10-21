@@ -1,8 +1,9 @@
 package com.lilemy.codechallenge.controller;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.lilemy.codechallenge.annotation.AuthCheck;
+import com.lilemy.codechallenge.annotation.CrawlerDetection;
 import com.lilemy.codechallenge.common.BaseResponse;
 import com.lilemy.codechallenge.common.DeleteRequest;
 import com.lilemy.codechallenge.common.ResultCode;
@@ -65,7 +66,7 @@ public class QuestionController {
 
     @Operation(summary = "批量删除题目")
     @PostMapping("/delete/batch")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteQuestionBatch(@RequestBody QuestionBatchDeleteRequest questionBatchDeleteRequest) {
         ThrowUtils.throwIf(questionBatchDeleteRequest == null, ResultCode.PARAMS_ERROR);
         boolean result = questionService.batchDeleteQuestions(questionBatchDeleteRequest.getQuestionIdList());
@@ -83,7 +84,7 @@ public class QuestionController {
 
     @Operation(summary = "更新题目")
     @PostMapping("/update")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updateQuestion(@RequestBody QuestionUpdateRequest questionUpdateRequest) {
         ThrowUtils.throwIf(questionUpdateRequest == null, ResultCode.PARAMS_ERROR);
         ThrowUtils.throwIf(questionUpdateRequest.getId() <= 0, ResultCode.PARAMS_ERROR);
@@ -93,6 +94,7 @@ public class QuestionController {
 
     @Operation(summary = "根据 id 获取题目（封装类）")
     @GetMapping("/get/vo")
+    @CrawlerDetection()
     public BaseResponse<QuestionVO> getQuestionVOById(Long id) {
         ThrowUtils.throwIf(id <= 0, ResultCode.PARAMS_ERROR);
         // 查询数据库
@@ -100,7 +102,7 @@ public class QuestionController {
         ThrowUtils.throwIf(question == null, ResultCode.NOT_FOUND_ERROR);
         Integer reviewStatus = question.getReviewStatus();
         Long userId = question.getUserId();
-        // 如果题目未通过审核，则只能创建用户
+        // 如果题目未通过审核，则只能创建用户查看
         if (reviewStatus != ReviewStatusEnum.PASS.getValue()) {
             User loginUser = userService.getLoginUser();
             Long loginUserId = loginUser.getId();
@@ -114,7 +116,7 @@ public class QuestionController {
 
     @Operation(summary = "分页获取题目列表（仅管理员可用）")
     @PostMapping("/list")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Page<Question>> listQuestionByPage(@RequestBody QuestionQueryRequest questionQueryRequest) {
         ThrowUtils.throwIf(questionQueryRequest == null, ResultCode.PARAMS_ERROR);
         long current = questionQueryRequest.getCurrent();
@@ -127,7 +129,7 @@ public class QuestionController {
 
     @Operation(summary = "分页获取未审核题目列表")
     @PostMapping("/list/reviewing")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Page<Question>> listReviewingQuestionByPage(@RequestBody QuestionQueryRequest questionQueryRequest) {
         ThrowUtils.throwIf(questionQueryRequest == null, ResultCode.PARAMS_ERROR);
         long current = questionQueryRequest.getCurrent();
@@ -170,7 +172,7 @@ public class QuestionController {
     // region 审核题目
     @Operation(summary = "审核题目")
     @PostMapping("/review")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> reviewQuestion(@RequestBody QuestionReviewRequest questionReviewRequest) {
         ThrowUtils.throwIf(questionReviewRequest == null, ResultCode.PARAMS_ERROR);
         boolean result = questionService.reviewQuestion(questionReviewRequest);

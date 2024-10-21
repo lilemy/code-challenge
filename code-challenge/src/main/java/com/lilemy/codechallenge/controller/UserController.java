@@ -1,7 +1,7 @@
 package com.lilemy.codechallenge.controller;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.lilemy.codechallenge.annotation.AuthCheck;
 import com.lilemy.codechallenge.common.BaseResponse;
 import com.lilemy.codechallenge.common.DeleteRequest;
 import com.lilemy.codechallenge.common.ResultCode;
@@ -18,6 +18,7 @@ import com.lilemy.codechallenge.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
@@ -54,7 +55,7 @@ public class UserController {
 
     @Operation(summary = "用户登录")
     @PostMapping("/login")
-    public BaseResponse<LoginUserVO> userLogin(@RequestBody UserLoginRequest userLoginRequest) {
+    public BaseResponse<LoginUserVO> userLogin(@RequestBody UserLoginRequest userLoginRequest, HttpServletRequest request) {
         if (userLoginRequest == null) {
             throw new BusinessException(ResultCode.PARAMS_ERROR);
         }
@@ -63,7 +64,7 @@ public class UserController {
         if (StringUtils.isAnyBlank(userAccount, userPassword)) {
             throw new BusinessException(ResultCode.PARAMS_ERROR);
         }
-        LoginUserVO loginUserVO = userService.userLogin(userAccount, userPassword);
+        LoginUserVO loginUserVO = userService.userLogin(userAccount, userPassword, request);
         return ResultUtils.success(loginUserVO);
     }
 
@@ -87,7 +88,7 @@ public class UserController {
 
     @Operation(summary = "创建用户")
     @PostMapping("/add")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Long> addUser(@RequestBody UserAddRequest userAddRequest) {
         ThrowUtils.throwIf(userAddRequest == null, ResultCode.PARAMS_ERROR);
         User user = new User();
@@ -103,7 +104,7 @@ public class UserController {
 
     @Operation(summary = "删除用户")
     @PostMapping("/delete")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteUser(@RequestBody DeleteRequest deleteRequest) {
         ThrowUtils.throwIf(deleteRequest == null || deleteRequest.getId() <= 0, ResultCode.PARAMS_ERROR);
         boolean b = userService.removeById(deleteRequest.getId());
@@ -112,7 +113,7 @@ public class UserController {
 
     @Operation(summary = "更新用户")
     @PostMapping("/update")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
         ThrowUtils.throwIf(userUpdateRequest == null || userUpdateRequest.getId() == null, ResultCode.PARAMS_ERROR);
         User user = new User();

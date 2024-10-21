@@ -1,8 +1,8 @@
 package com.lilemy.codechallenge.controller;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.lilemy.codechallenge.annotation.AuthCheck;
 import com.lilemy.codechallenge.common.BaseResponse;
 import com.lilemy.codechallenge.common.DeleteRequest;
 import com.lilemy.codechallenge.common.ResultCode;
@@ -44,7 +44,7 @@ public class QuestionBankController {
 
     @Operation(summary = "添加题库")
     @PostMapping("/add")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Long> addQuestionBank(@RequestBody QuestionBankAddRequest questionBankAddRequest) {
         ThrowUtils.throwIf(questionBankAddRequest == null, ResultCode.PARAMS_ERROR);
         Long addQuestionBankId = questionBankService.addQuestionBank(questionBankAddRequest);
@@ -53,7 +53,7 @@ public class QuestionBankController {
 
     @Operation(summary = "删除题库")
     @PostMapping("/delete")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> deleteQuestionBank(@RequestBody DeleteRequest deleteRequest) {
         ThrowUtils.throwIf(deleteRequest == null, ResultCode.PARAMS_ERROR);
         Long questionBankId = deleteRequest.getId();
@@ -64,7 +64,7 @@ public class QuestionBankController {
 
     @Operation(summary = "更新题库")
     @PostMapping("/update")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updateQuestionBank(@RequestBody QuestionBankUpdateRequest questionBankUpdateRequest) {
         ThrowUtils.throwIf(questionBankUpdateRequest == null, ResultCode.PARAMS_ERROR);
         Boolean result = questionBankService.updateQuestionBank(questionBankUpdateRequest);
@@ -109,7 +109,7 @@ public class QuestionBankController {
 
     @Operation(summary = "分页获取题库列表（仅管理员可用）")
     @PostMapping("/list")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Page<QuestionBank>> listQuestionBankByPage(@RequestBody QuestionBankQueryRequest questionBankQueryRequest) {
         long current = questionBankQueryRequest.getCurrent();
         long size = questionBankQueryRequest.getPageSize();

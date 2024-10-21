@@ -7,6 +7,7 @@ import com.lilemy.codechallenge.model.dto.user.UserQueryRequest;
 import com.lilemy.codechallenge.model.entity.User;
 import com.lilemy.codechallenge.model.vo.LoginUserVO;
 import com.lilemy.codechallenge.model.vo.UserVO;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
@@ -33,7 +34,7 @@ public interface UserService extends IService<User> {
      * @param userPassword 用户密码
      * @return 用户信息（脱敏）
      */
-    LoginUserVO userLogin(String userAccount, String userPassword);
+    LoginUserVO userLogin(String userAccount, String userPassword, HttpServletRequest request);
 
     /**
      * 用户编辑

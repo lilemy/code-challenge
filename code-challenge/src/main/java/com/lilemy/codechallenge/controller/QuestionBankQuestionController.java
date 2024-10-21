@@ -1,9 +1,9 @@
 package com.lilemy.codechallenge.controller;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.lilemy.codechallenge.annotation.AuthCheck;
 import com.lilemy.codechallenge.common.BaseResponse;
 import com.lilemy.codechallenge.common.ResultCode;
 import com.lilemy.codechallenge.common.ResultUtils;
@@ -36,7 +36,7 @@ public class QuestionBankQuestionController {
 
     @Operation(summary = "创建题库题目关联")
     @PostMapping("/add")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Long> addQuestionBankQuestion(@RequestBody QuestionBankQuestionAddRequest questionBankQuestionAddRequest) {
         ThrowUtils.throwIf(questionBankQuestionAddRequest == null, ResultCode.PARAMS_ERROR);
         QuestionBankQuestion questionBankQuestion = new QuestionBankQuestion();
@@ -56,7 +56,7 @@ public class QuestionBankQuestionController {
 
     @Operation(summary = "移除题库题目关联")
     @PostMapping("/remove")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> removeQuestionBankQuestion(
             @RequestBody QuestionBankQuestionRemoveRequest questionBankQuestionRemoveRequest
     ) {
@@ -75,7 +75,7 @@ public class QuestionBankQuestionController {
 
     @Operation(summary = "更新题库题目关联")
     @PostMapping("/update")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updateQuestionBankQuestion(@RequestBody QuestionBankQuestionUpdateRequest questionBankQuestionUpdateRequest) {
         // 参数校验
         ThrowUtils.throwIf(questionBankQuestionUpdateRequest == null, ResultCode.PARAMS_ERROR);
@@ -112,7 +112,7 @@ public class QuestionBankQuestionController {
 
     @Operation(summary = "批量添加题目到题库")
     @PostMapping("/add/batch")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> batchAddQuestionsToBank(@RequestBody QuestionBankQuestionBatchRequest questionBankQuestionBatchAddRequest) {
         ThrowUtils.throwIf(questionBankQuestionBatchAddRequest == null, ResultCode.PARAMS_ERROR);
         questionBankQuestionService.batchAddQuestionsToBank(questionBankQuestionBatchAddRequest);
@@ -121,7 +121,7 @@ public class QuestionBankQuestionController {
 
     @Operation(summary = "批量从题库移除题目")
     @PostMapping("remove/batch")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> batchRemoveQuestionsFromBank(@RequestBody QuestionBankQuestionBatchRequest questionBankQuestionBatchRemoveRequest) {
         ThrowUtils.throwIf(questionBankQuestionBatchRemoveRequest == null, ResultCode.PARAMS_ERROR);
         questionBankQuestionService.batchRemoveQuestionsFromBank(questionBankQuestionBatchRemoveRequest);
