@@ -14,3 +14,9 @@ server:
 sa-token:
   # 是否允许同一账号多地同时登录 （为 true 时允许一起登录, 为 false 时新登录挤掉旧登录）
   is-concurrent: false
+# 热 key 探测
+hotkey:
+  appName: codechallenge
+  etcd-server: http://192.168.37.129:2379
+  caffeine-size: 10000
+  push-period: 1000

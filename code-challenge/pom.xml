@@ -75,6 +75,12 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
         </dependency>
+        <!-- https://gitee.com/jd-platform-opensource/hotkey 拉取镜像 mvn install -->
+        <dependency>
+            <groupId>com.jd.platform.hotkey</groupId>
+            <artifactId>hotkey-client</artifactId>
+            <version>0.0.4-SNAPSHOT</version>
+        </dependency>
         <!-- tools -->
         <dependency>
             <groupId>org.projectlombok</groupId>
