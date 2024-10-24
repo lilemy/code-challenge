@@ -17,6 +17,5 @@ sa-token:
 # 热 key 探测
 hotkey:
   appName: codechallenge
-  etcd-server: http://192.168.37.129:2379
   caffeine-size: 10000
   push-period: 1000

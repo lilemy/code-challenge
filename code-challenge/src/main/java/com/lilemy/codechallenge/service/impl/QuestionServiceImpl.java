@@ -6,6 +6,7 @@ import cn.hutool.json.JSONUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.conditions.update.LambdaUpdateChainWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lilemy.codechallenge.common.ResultCode;
@@ -15,38 +16,46 @@ import com.lilemy.codechallenge.exception.ThrowUtils;
 import com.lilemy.codechallenge.mapper.QuestionMapper;
 import com.lilemy.codechallenge.model.dto.question.*;
 import com.lilemy.codechallenge.model.entity.Question;
+import com.lilemy.codechallenge.model.entity.QuestionBank;
 import com.lilemy.codechallenge.model.entity.QuestionBankQuestion;
 import com.lilemy.codechallenge.model.entity.User;
 import com.lilemy.codechallenge.model.enums.ReviewStatusEnum;
+import com.lilemy.codechallenge.model.vo.QuestionBankListVO;
+import com.lilemy.codechallenge.model.vo.QuestionPersonalVO;
 import com.lilemy.codechallenge.model.vo.QuestionVO;
 import com.lilemy.codechallenge.model.vo.UserVO;
 import com.lilemy.codechallenge.service.QuestionBankQuestionService;
+import com.lilemy.codechallenge.service.QuestionBankService;
 import com.lilemy.codechallenge.service.QuestionService;
 import com.lilemy.codechallenge.service.UserService;
 import com.lilemy.codechallenge.util.SqlUtils;
 import jakarta.annotation.Resource;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
  * @author qq233
  * @description 针对表【question(题目)】的数据库操作Service实现
  */
+@Slf4j
 @Service
 public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
         implements QuestionService {
 
     @Resource
     private UserService userService;
+
+    @Resource
+    @Lazy
+    private QuestionBankService questionBankService;
 
     @Resource
     private QuestionBankQuestionService questionBankQuestionService;
@@ -138,25 +147,77 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
     }
 
     @Override
+    @Transactional(rollbackFor = Exception.class)
     public boolean editQuestion(QuestionEditRequest questionEditRequest) {
         // 判断是否存在
         Long id = questionEditRequest.getId();
         Question oldQuestion = this.getById(id);
         ThrowUtils.throwIf(oldQuestion == null, ResultCode.NOT_FOUND_ERROR);
         User loginUser = userService.getLoginUser();
-        // 仅本人可删除
+        // 仅本人可编辑
         ThrowUtils.throwIf(!oldQuestion.getUserId().equals(loginUser.getId()), ResultCode.NO_AUTH_ERROR);
         Question question = new Question();
         BeanUtils.copyProperties(questionEditRequest, question);
+        LambdaUpdateChainWrapper<Question> lambdaUpdate = this.lambdaUpdate();
+        lambdaUpdate.eq(Question::getId, id);
+        // 设置题目标签
         List<String> tags = questionEditRequest.getTags();
         if (tags != null) {
-            question.setTags(JSONUtil.toJsonStr(tags));
+            lambdaUpdate.set(Question::getTags, JSONUtil.toJsonStr(tags));
         }
-        question.setEditTime(new Date());
+        String title = questionEditRequest.getTitle();
+        String content = questionEditRequest.getContent();
+        String answer = questionEditRequest.getAnswer();
+        lambdaUpdate.set(StringUtils.isNotBlank(title), Question::getTitle, title);
+        lambdaUpdate.set(StringUtils.isNotBlank(content), Question::getContent, content);
+        lambdaUpdate.set(StringUtils.isNotBlank(answer), Question::getAnswer, answer);
+        // 设置题库题目关联
+        List<Long> questionBankList = questionEditRequest.getQuestionBankList();
+        // 获取题目题库关联的题库 id
+        LambdaQueryWrapper<QuestionBankQuestion> lambdaQueryWrapper = Wrappers.lambdaQuery(QuestionBankQuestion.class)
+                .select(QuestionBankQuestion::getQuestionBankId)
+                .eq(QuestionBankQuestion::getQuestionId, id);
+        List<Long> bankIds = questionBankQuestionService.listObjs(lambdaQueryWrapper, obj -> (Long) obj);
+        // 获取需要添加的题目题库关联
+        List<Long> addIdList = new ArrayList<>(questionBankList);
+        addIdList.removeAll(bankIds);
+        if (CollUtil.isNotEmpty(addIdList)) {
+            List<QuestionBankQuestion> questionBankQuestionList = addIdList.stream()
+                    .map(bankId -> {
+                        QuestionBankQuestion questionBankQuestion = new QuestionBankQuestion();
+                        questionBankQuestion.setQuestionId(id);
+                        questionBankQuestion.setQuestionBankId(bankId);
+                        // 设置默认值
+                        questionBankQuestion.setUserId(loginUser.getId());
+                        return questionBankQuestion;
+                    })
+                    .toList();
+            questionBankQuestionService.saveBatch(questionBankQuestionList);
+        }
+        // 获取需要添加的题目题库关联
+        List<Long> deleteIdList = new ArrayList<>(bankIds);
+        deleteIdList.removeAll(questionBankList);
+        if (CollUtil.isNotEmpty(deleteIdList)) {
+            QueryWrapper<QuestionBankQuestion> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("question_id", id);
+            queryWrapper.in("question_bank_id", deleteIdList);
+            questionBankQuestionService.remove(queryWrapper);
+        }
+        // 设置编辑时间
+        lambdaUpdate.set(Question::getEditTime, new Date());
+        // 需重新审核
+        if (!oldQuestion.getReviewStatus().equals(ReviewStatusEnum.REVIEWING.getValue())) {
+            lambdaUpdate
+                    .set(Question::getReviewMessage, null)
+                    .set(Question::getReviewStatus, ReviewStatusEnum.REVIEWING.getValue())
+                    .set(Question::getReviewerId, null)
+                    .set(Question::getReviewTime, null);
+        }
         // 数据校验
         this.validQuestion(question, false);
-        boolean result = this.updateById(question);
-        ThrowUtils.throwIf(!result, ResultCode.OPERATION_ERROR);
+        // 操作数据库，更新题目数据
+        boolean update = lambdaUpdate.update();
+        ThrowUtils.throwIf(!update, ResultCode.OPERATION_ERROR);
         return true;
     }
 
@@ -242,6 +303,31 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
     }
 
     @Override
+    public QuestionPersonalVO getQuestionPersonalById(Long id) {
+        // 查询数据库
+        Question question = this.getById(id);
+        ThrowUtils.throwIf(question == null, ResultCode.NOT_FOUND_ERROR);
+        // 判断是否为创建用户
+        Long loginUserId = userService.getLoginUser().getId();
+        ThrowUtils.throwIf(!question.getUserId().equals(loginUserId), ResultCode.NO_AUTH_ERROR);
+        QuestionPersonalVO questionPersonalVO = QuestionPersonalVO.objToVo(question);
+        LambdaQueryWrapper<QuestionBankQuestion> lambdaQueryWrapper = Wrappers.lambdaQuery(QuestionBankQuestion.class)
+                .select(QuestionBankQuestion::getQuestionBankId)
+                .eq(QuestionBankQuestion::getQuestionId, id);
+        List<Long> bankIdList = questionBankQuestionService.listObjs(lambdaQueryWrapper, obj -> (Long) obj);
+        if (CollUtil.isNotEmpty(bankIdList)) {
+            QueryWrapper<QuestionBank> queryWrapper = new QueryWrapper<>();
+            queryWrapper.in("id", bankIdList);
+            queryWrapper.select("id", "title", "description");
+            List<QuestionBankListVO> bankListVOList = questionBankService.list(queryWrapper).stream()
+                    .map(QuestionBankListVO::objToVO)
+                    .toList();
+            questionPersonalVO.setQuestionBankList(bankListVOList);
+        }
+        return questionPersonalVO;
+    }
+
+    @Override
     public Page<QuestionVO> getQuestionVOPage(Page<Question> questionPage) {
         List<Question> questionList = questionPage.getRecords();
         Page<QuestionVO> questionVOPage = new Page<>(questionPage.getCurrent(), questionPage.getSize(), questionPage.getTotal());
@@ -265,6 +351,49 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
         });
         questionVOPage.setRecords(questionVOList);
         return questionVOPage;
+    }
+
+    @Override
+    public Page<QuestionPersonalVO> getQuestionPersonalPage(Page<Question> questionPage) {
+        List<Question> questionList = questionPage.getRecords();
+        Page<QuestionPersonalVO> questionPersonalVOPage = new Page<>(questionPage.getCurrent(), questionPage.getSize(), questionPage.getTotal());
+        if (CollUtil.isEmpty(questionList)) {
+            return questionPersonalVOPage;
+        }
+        // 对象列表 => 封装对象列表
+        List<QuestionPersonalVO> questionPersonalList = questionList.stream().map(QuestionPersonalVO::objToVo).collect(Collectors.toList());
+        // 关联查询题库信息
+        Map<Long, List<QuestionBankListVO>> questionBankListVO = questionList.stream().collect(Collectors.toMap(
+                Question::getId,
+                question -> {
+                    Long questionId = question.getId();
+                    LambdaQueryWrapper<QuestionBankQuestion> lambdaQueryWrapper = Wrappers.lambdaQuery(QuestionBankQuestion.class)
+                            .select(QuestionBankQuestion::getQuestionBankId)
+                            .eq(QuestionBankQuestion::getQuestionId, questionId);
+                    // 获取所属题库列表
+                    List<Long> questionBankIdList = questionBankQuestionService.listObjs(lambdaQueryWrapper, obj -> (Long) obj);
+                    if (CollUtil.isNotEmpty(questionBankIdList)) {
+                        QueryWrapper<QuestionBank> queryWrapper = new QueryWrapper<>();
+                        queryWrapper.in("id", questionBankIdList);
+                        queryWrapper.select("id", "title", "description");
+                        List<QuestionBank> list = questionBankService.list(queryWrapper);
+                        return list.stream()
+                                .map(QuestionBankListVO::objToVO)
+                                .collect(Collectors.toList());
+                    }
+                    return Collections.emptyList();
+                }));
+        // 填充信息
+        questionPersonalList.forEach(questionPersonalVO -> {
+            Long questionId = questionPersonalVO.getId();
+            List<QuestionBankListVO> questionBankListVOList = new ArrayList<>();
+            if (questionBankListVO.containsKey(questionId)) {
+                questionBankListVOList = questionBankListVO.get(questionId);
+            }
+            questionPersonalVO.setQuestionBankList(questionBankListVOList);
+        });
+        questionPersonalVOPage.setRecords(questionPersonalList);
+        return questionPersonalVOPage;
     }
 
     @Override
@@ -354,7 +483,3 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
     }
 
 }
-
-
-
-

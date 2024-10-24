@@ -1,5 +1,6 @@
 package com.lilemy.codechallenge.model.vo;
 
+import com.lilemy.codechallenge.model.entity.QuestionBank;
 import lombok.Data;
 
 import java.io.Serial;
@@ -27,4 +28,12 @@ public class QuestionBankListVO implements Serializable {
      * 题库描述
      */
     private String description;
+
+    public static QuestionBankListVO objToVO(QuestionBank questionBank) {
+        QuestionBankListVO questionBankListVO = new QuestionBankListVO();
+        questionBankListVO.setId(questionBank.getId());
+        questionBankListVO.setTitle(questionBank.getTitle());
+        questionBankListVO.setDescription(questionBank.getDescription());
+        return questionBankListVO;
+    }
 }

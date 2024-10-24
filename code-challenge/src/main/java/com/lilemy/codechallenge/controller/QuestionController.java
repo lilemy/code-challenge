@@ -15,6 +15,7 @@ import com.lilemy.codechallenge.model.dto.question.*;
 import com.lilemy.codechallenge.model.entity.Question;
 import com.lilemy.codechallenge.model.entity.User;
 import com.lilemy.codechallenge.model.enums.ReviewStatusEnum;
+import com.lilemy.codechallenge.model.vo.QuestionPersonalVO;
 import com.lilemy.codechallenge.model.vo.QuestionVO;
 import com.lilemy.codechallenge.service.QuestionService;
 import com.lilemy.codechallenge.service.UserService;
@@ -114,6 +115,14 @@ public class QuestionController {
         return ResultUtils.success(questionService.getQuestionVO(question));
     }
 
+    @Operation(summary = "根据 id 获取个人题目（封装类）")
+    @GetMapping("/get/my/vo")
+    public BaseResponse<QuestionPersonalVO> getQuestionPersonalById(Long id) {
+        ThrowUtils.throwIf(id <= 0, ResultCode.PARAMS_ERROR);
+        QuestionPersonalVO result = questionService.getQuestionPersonalById(id);
+        return ResultUtils.success(result);
+    }
+
     @Operation(summary = "分页获取题目列表（仅管理员可用）")
     @PostMapping("/list")
     @SaCheckRole(UserConstant.ADMIN_ROLE)
@@ -159,12 +168,18 @@ public class QuestionController {
 
     @Operation(summary = "分页获取当前登录用户创建的题目列表")
     @PostMapping("/list/my/vo")
-    public BaseResponse<Page<QuestionVO>> listMyQuestionVOByPage(@RequestBody QuestionQueryRequest questionQueryRequest) {
+    public BaseResponse<Page<QuestionPersonalVO>> listMyQuestionVOByPage(@RequestBody QuestionQueryRequest questionQueryRequest) {
         ThrowUtils.throwIf(questionQueryRequest == null, ResultCode.PARAMS_ERROR);
+        long current = questionQueryRequest.getCurrent();
+        long size = questionQueryRequest.getPageSize();
         // 补充查询条件，只查询当前登录用户的数据
         User loginUser = userService.getLoginUser();
         questionQueryRequest.setUserId(loginUser.getId());
-        return listQuestionVOByPage(questionQueryRequest);
+        // 查询数据库
+        Page<Question> questionPage = questionService.page(new Page<>(current, size),
+                questionService.getQueryWrapper(questionQueryRequest));
+        // 获取封装类
+        return ResultUtils.success(questionService.getQuestionPersonalPage(questionPage));
     }
 
     // endregion

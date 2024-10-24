@@ -28,7 +28,7 @@ public class StpInterfaceImpl implements StpInterface {
     @Override
     public List<String> getRoleList(Object loginId, String s) {
         // 从当前登录用户信息中获取角色
-        User user = (User) StpUtil.getSessionByLoginId(loginId).get(USER_LOGIN_STATE);
+        User user = (User) StpUtil.getTokenSession().get(USER_LOGIN_STATE);
         return Collections.singletonList(user.getUserRole());
     }
 }

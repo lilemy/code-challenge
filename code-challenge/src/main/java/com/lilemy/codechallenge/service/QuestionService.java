@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lilemy.codechallenge.model.dto.question.*;
 import com.lilemy.codechallenge.model.entity.Question;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.lilemy.codechallenge.model.vo.QuestionPersonalVO;
 import com.lilemy.codechallenge.model.vo.QuestionVO;
 
 import java.util.List;
@@ -88,12 +89,28 @@ public interface QuestionService extends IService<Question> {
     QuestionVO getQuestionVO(Question question);
 
     /**
+     * 根据 id 获取个人题目封装
+     *
+     * @param id 题目 id
+     * @return 个人题目封装
+     */
+    QuestionPersonalVO getQuestionPersonalById(Long id);
+
+    /**
      * 分页获取题目封装
      *
      * @param questionPage 题目信息分页
      * @return 题目封装信息分页
      */
     Page<QuestionVO> getQuestionVOPage(Page<Question> questionPage);
+
+    /**
+     * 分页获取个人题目封装
+     *
+     * @param questionPage 题目信息分页
+     * @return 个人题目封装
+     */
+    Page<QuestionPersonalVO> getQuestionPersonalPage(Page<Question> questionPage);
 
     /**
      * 分页获取题目列表
@@ -127,4 +144,5 @@ public interface QuestionService extends IService<Question> {
      * @return 是否操作成功
      */
     boolean batchDeleteQuestions(List<Long> questionIdList);
+
 }

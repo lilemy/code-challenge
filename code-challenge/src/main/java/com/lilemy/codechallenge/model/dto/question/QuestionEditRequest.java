@@ -25,6 +25,11 @@ public class QuestionEditRequest implements Serializable {
     private String title;
 
     /**
+     * 题库 id 列表
+     */
+    private List<Long> questionBankList;
+
+    /**
      * 内容
      */
     private String content;

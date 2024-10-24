@@ -111,13 +111,7 @@ public class QuestionBankController {
         QueryWrapper<QuestionBank> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("id", "title", "description");
         List<QuestionBank> list = questionBankService.list(queryWrapper);
-        List<QuestionBankListVO> questionBankListVOList = list.stream().map(questionBank -> {
-            QuestionBankListVO questionBankListVO = new QuestionBankListVO();
-            questionBankListVO.setId(questionBank.getId());
-            questionBankListVO.setTitle(questionBank.getTitle());
-            questionBankListVO.setDescription(questionBank.getDescription());
-            return questionBankListVO;
-        }).toList();
+        List<QuestionBankListVO> questionBankListVOList = list.stream().map(QuestionBankListVO::objToVO).toList();
         return ResultUtils.success(questionBankListVOList);
     }
 
