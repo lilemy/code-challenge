@@ -102,7 +102,6 @@ const QuestionTableList: React.FC = () => {
       valueType: 'text',
       hideInForm: true,
     },
-
     {
       title: '创建时间',
       sorter: true,

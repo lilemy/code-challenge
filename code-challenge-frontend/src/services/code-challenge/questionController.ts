@@ -71,6 +71,21 @@ export async function editQuestion(
   });
 }
 
+/** 根据 id 获取个人题目（封装类） GET /question/get/my/vo */
+export async function getQuestionPersonalById(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getQuestionPersonalByIdParams,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseQuestionPersonalVO>('/question/get/my/vo', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
 /** 根据 id 获取题目（封装类） GET /question/get/vo */
 export async function getQuestionVoById(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
@@ -106,7 +121,7 @@ export async function listMyQuestionVoByPage(
   body: API.QuestionQueryRequest,
   options?: { [key: string]: any },
 ) {
-  return request<API.BaseResponsePageQuestionVO>('/question/list/my/vo', {
+  return request<API.BaseResponsePageQuestionPersonalVO>('/question/list/my/vo', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

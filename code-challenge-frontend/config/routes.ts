@@ -33,6 +33,12 @@ export default [
     hideInMenu: true,
   },
   {
+    path: '/question/personal/:questionId',
+    name: '个人题目详情',
+    component: './Question/QuestionPersonal',
+    hideInMenu: true,
+  },
+  {
     path: '/question/create',
     name: '创建题目',
     component: './Question/QuestionCreate',

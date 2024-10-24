@@ -1,13 +1,13 @@
-import QuestionList from '@/components/QuestionList';
-import CalendarChart from '@/pages/Account/Center/CalendarChart';
-import {listMyQuestionVoByPage} from '@/services/code-challenge/questionController';
-import {getLoginUser} from '@/services/code-challenge/userController';
-import {GridContent} from '@ant-design/pro-layout';
-import {Card, Col, Image, message, Row} from 'antd';
+import CalendarChart from '@/pages/Account/Center/components/CalendarChart';
+import PersonalQuestionList from '@/pages/Account/Center/components/PersonalQuestionList';
+import { listMyQuestionVoByPage } from '@/services/code-challenge/questionController';
+import { getLoginUser } from '@/services/code-challenge/userController';
+import { GridContent } from '@ant-design/pro-layout';
+import { Card, Col, Image, message, Row } from 'antd';
 import Meta from 'antd/es/card/Meta';
 import Paragraph from 'antd/es/typography/Paragraph';
 import Title from 'antd/es/typography/Title';
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 
 /**
  * 个人中心
@@ -17,7 +17,7 @@ const Center: React.FC = () => {
   // 当前登录用户
   const [loginUserVO, setLoginUserVO] = React.useState<API.LoginUserVO>();
   // 当前用户题目列表
-  const [userQuestionList, setUserQuestionList] = React.useState<API.QuestionVO[]>([]);
+  const [userQuestionList, setUserQuestionList] = React.useState<API.QuestionPersonalVO[]>([]);
   const [loading, setLoading] = React.useState(false);
   // 菜单栏
   const [activeTabKey, setActiveTabKey] = useState<string>('record');
@@ -54,7 +54,7 @@ const Center: React.FC = () => {
       return <CalendarChart />;
     }
     if (tabValue === 'question') {
-      return <QuestionList questionList={userQuestionList} />;
+      return <PersonalQuestionList questionList={userQuestionList} />;
     }
     return null;
   };

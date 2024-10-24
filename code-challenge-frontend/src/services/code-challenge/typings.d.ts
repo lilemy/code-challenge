@@ -53,6 +53,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponsePageQuestionPersonalVO = {
+    code?: number;
+    data?: PageQuestionPersonalVO;
+    message?: string;
+  };
+
   type BaseResponsePageQuestionVO = {
     code?: number;
     data?: PageQuestionVO;
@@ -80,6 +86,12 @@ declare namespace API {
   type BaseResponseQuestionBankVO = {
     code?: number;
     data?: QuestionBankVO;
+    message?: string;
+  };
+
+  type BaseResponseQuestionPersonalVO = {
+    code?: number;
+    data?: QuestionPersonalVO;
     message?: string;
   };
 
@@ -112,6 +124,10 @@ declare namespace API {
   type getQuestionBankVOByIdParams = {
     id: number;
     isNeedQueryQuestionList: boolean;
+  };
+
+  type getQuestionPersonalByIdParams = {
+    id: number;
   };
 
   type getQuestionVOByIdParams = {
@@ -197,6 +213,20 @@ declare namespace API {
     orders?: OrderItem[];
     optimizeCountSql?: PageQuestionBankVO;
     searchCount?: PageQuestionBankVO;
+    optimizeJoinOfCountSql?: boolean;
+    maxLimit?: number;
+    countId?: string;
+    pages?: number;
+  };
+
+  type PageQuestionPersonalVO = {
+    records?: QuestionPersonalVO[];
+    total?: number;
+    size?: number;
+    current?: number;
+    orders?: OrderItem[];
+    optimizeCountSql?: PageQuestionPersonalVO;
+    searchCount?: PageQuestionPersonalVO;
     optimizeJoinOfCountSql?: boolean;
     maxLimit?: number;
     countId?: string;
@@ -383,7 +413,7 @@ declare namespace API {
 
   type QuestionCreateRequest = {
     title?: string;
-    questionBankId?: number;
+    questionBankIds?: number[];
     content?: string;
     tags?: string[];
     answer?: string;
@@ -395,6 +425,23 @@ declare namespace API {
     content?: string;
     tags?: string[];
     answer?: string;
+  };
+
+  type QuestionPersonalVO = {
+    id?: number;
+    title?: string;
+    content?: string;
+    answer?: string;
+    userId?: number;
+    editTime?: string;
+    createTime?: string;
+    updateTime?: string;
+    tagList?: string[];
+    reviewStatus?: number;
+    reviewMessage?: string;
+    reviewerId?: number;
+    reviewTime?: string;
+    questionBankList?: QuestionBankListVO[];
   };
 
   type QuestionQueryRequest = {
