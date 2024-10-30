@@ -7,6 +7,7 @@ interface Props {
   oldData?: API.QuestionBank;
   modalVisible: boolean;
   columns: ProColumns<API.QuestionBank>[];
+  bankUrl: string;
   onSubmit: () => void;
   onCancel: () => void;
 }
@@ -31,7 +32,7 @@ const handleUpdate = async (fields: API.QuestionBankUpdateRequest) => {
 };
 
 const UpdateForm: React.FC<Props> = (props) => {
-  const { oldData, modalVisible, columns, onSubmit, onCancel } = props;
+  const { oldData, modalVisible, columns, bankUrl, onSubmit, onCancel } = props;
 
   if (!oldData) {
     return <></>;
@@ -45,9 +46,11 @@ const UpdateForm: React.FC<Props> = (props) => {
           initialValues: oldData,
         }}
         type="form"
-        onSubmit={async (values) => {
+        onSubmit={async (values: API.QuestionBankUpdateRequest) => {
+          console.log(bankUrl);
           const success = await handleUpdate({
             ...values,
+            picture: bankUrl,
             id: oldData?.id,
           });
           if (success) {

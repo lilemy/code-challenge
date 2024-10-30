@@ -1,12 +1,13 @@
 import CreateForm from '@/pages/Admin/QuestionBank/components/CreateForm';
 import UpdateForm from '@/pages/Admin/QuestionBank/components/UpdateForm';
+import { uploadFile } from '@/services/code-challenge/fileController';
 import {
   deleteQuestionBank,
   listQuestionBankByPage,
 } from '@/services/code-challenge/questionBankController';
-import { PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined, UploadOutlined } from '@ant-design/icons';
 import { type ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Button, message, Space, Typography } from 'antd';
+import { Button, message, Space, Typography, Upload } from 'antd';
 import React, { useRef, useState } from 'react';
 
 const QuestionBankTableList: React.FC = () => {
@@ -17,6 +18,8 @@ const QuestionBankTableList: React.FC = () => {
   const actionRef = useRef<ActionType>();
   // 当前题库的数据
   const [currentRow, setCurrentRow] = useState<API.QuestionBank>();
+  // 上传图片 url
+  const [bankUrl, setBankUrl] = useState<string>('');
 
   /**
    * @zh-CN 删除题库
@@ -41,12 +44,35 @@ const QuestionBankTableList: React.FC = () => {
     }
   };
 
+  // 图片上传
+  const handleUpload = async (options: any) => {
+    const { file } = options;
+    // 构造请求参数
+    const params: API.uploadFileParams = {
+      uploadFileRequest: {
+        biz: 'question_bank_avatar',
+        bizId: currentRow?.id,
+      },
+    };
+    // 使用 FormData 包装文件数据
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const res = await uploadFile(params, formData);
+      setBankUrl(res.data || '');
+      message.success('头像上传成功');
+    } catch (e: any) {
+      message.error('头像上传失败，' + e.message);
+    }
+  };
+
   const columns: ProColumns<API.QuestionBank>[] = [
     {
       title: 'id',
       dataIndex: 'id',
       valueType: 'text',
       hideInForm: true,
+      width: 160,
     },
     {
       title: '标题',
@@ -56,7 +82,7 @@ const QuestionBankTableList: React.FC = () => {
     {
       title: '描述',
       dataIndex: 'description',
-      valueType: 'text',
+      valueType: 'textarea',
     },
     {
       title: '图片',
@@ -66,6 +92,17 @@ const QuestionBankTableList: React.FC = () => {
         width: 64,
       },
       hideInSearch: true,
+      renderFormItem: (_, { value }) => {
+        // value 和 onchange 会通过 form 自动注入
+        return (
+          <Upload {...value} customRequest={handleUpload} maxCount={1}>
+            <Button>
+              <UploadOutlined />
+              更换头像
+            </Button>
+          </Upload>
+        );
+      },
     },
     {
       title: '创建时间',
@@ -166,6 +203,7 @@ const QuestionBankTableList: React.FC = () => {
         modalVisible={updateModalVisible}
         columns={columns}
         oldData={currentRow}
+        bankUrl={bankUrl}
         onSubmit={() => {
           setUpdateModalVisible(false);
           actionRef.current?.reload();

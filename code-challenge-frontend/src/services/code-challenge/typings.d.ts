@@ -101,6 +101,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseString = {
+    code?: number;
+    data?: string;
+    message?: string;
+  };
+
   type BaseResponseUser = {
     code?: number;
     data?: User;
@@ -422,6 +428,7 @@ declare namespace API {
   type QuestionEditRequest = {
     id?: number;
     title?: string;
+    questionBankList?: number[];
     content?: string;
     tags?: string[];
     answer?: string;
@@ -487,6 +494,15 @@ declare namespace API {
     updateTime?: string;
     tagList?: string[];
     user?: UserVO;
+  };
+
+  type uploadFileParams = {
+    uploadFileRequest: UploadFileRequest;
+  };
+
+  type UploadFileRequest = {
+    biz?: string;
+    bizId?: number;
   };
 
   type User = {

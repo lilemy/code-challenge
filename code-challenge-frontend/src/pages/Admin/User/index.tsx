@@ -45,6 +45,7 @@ const UserTableList: React.FC = () => {
       dataIndex: 'id',
       valueType: 'text',
       width: 160,
+      hideInForm: true,
     },
     {
       title: '账号',

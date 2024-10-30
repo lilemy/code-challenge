@@ -50,6 +50,7 @@ const QuestionTableList: React.FC = () => {
       dataIndex: 'id',
       valueType: 'text',
       hideInForm: true,
+      width: 160,
     },
     {
       title: '所属题库',

@@ -1,19 +1,21 @@
 import MdEditor from '@/components/Markdown/MdEditor';
 import MdViewer from '@/components/Markdown/MdViewer';
 import TagList from '@/components/TagList';
+import { uploadFile } from '@/services/code-challenge/fileController';
 import { getQuestionBankList } from '@/services/code-challenge/questionBankController';
 import {
   editQuestion,
   getQuestionPersonalById,
 } from '@/services/code-challenge/questionController';
 import { useParams } from '@@/exports';
+import { UploadOutlined } from '@ant-design/icons';
 import { ProDescriptions, ProFormSelect, ProFormText } from '@ant-design/pro-components';
 import { ProForm, ProFormInstance } from '@ant-design/pro-form/lib';
-import { Button, Card, Input, message, Tag } from 'antd';
+import { Button, Card, Input, message, Space, Tag, Upload } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 
 /**
- * 个人题目详情页4
+ * 个人题目详情页
  */
 const QuestionPersonal: React.FC = () => {
   const params = useParams();
@@ -24,6 +26,8 @@ const QuestionPersonal: React.FC = () => {
   const [contentMd, setContentMd] = useState<string>('');
   const [answerMd, setAnswerMd] = useState<string>('');
   const [tags, setTags] = useState<string[]>([]);
+  const [showPic, setShowPic] = useState<boolean>(false);
+  const [picList, setPicList] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState('');
   const formRef = useRef<ProFormInstance>();
   const [loading, setLoading] = useState<boolean>(false);
@@ -184,7 +188,7 @@ const QuestionPersonal: React.FC = () => {
    * @param value
    * @param tags
    */
-  const onSubmitFrom = async (value: API.QuestionPersonalVO, tags: string[]) => {
+  const onSubmitFrom = async (value: API.QuestionEditRequest, tags: string[]) => {
     setLoading(true);
     try {
       await editQuestion({
@@ -199,6 +203,31 @@ const QuestionPersonal: React.FC = () => {
       message.error('保存失败：', e.message);
     }
     setLoading(false);
+  };
+
+  // 图片上传
+  const handleUpload = async (options: any) => {
+    const { file } = options;
+    // 构造请求参数
+    const params: API.uploadFileParams = {
+      uploadFileRequest: {
+        biz: 'question_md',
+        bizId: questionId as any,
+      },
+    };
+    // 使用 FormData 包装文件数据
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const res = await uploadFile(params, formData);
+      if (res.data) {
+        setPicList((prevList) => [res.data || '', ...prevList]);
+      }
+      setShowPic(true);
+      message.success('图片上传成功');
+    } catch (e: any) {
+      message.error('图片上传失败，' + e.message);
+    }
   };
 
   return (
@@ -248,7 +277,48 @@ const QuestionPersonal: React.FC = () => {
                 }}
               />
             </ProFormText>
-            <ProFormText label="推荐答案：" name="answer">
+            <ProFormText
+              label="推荐答案："
+              name="answer"
+              extra={
+                <div>
+                  <Space>
+                    {showPic ? (
+                      <Button size="middle" type="primary" onClick={() => setShowPic(false)}>
+                        隐藏图片
+                      </Button>
+                    ) : (
+                      <Button size="middle" type="primary" onClick={() => setShowPic(true)}>
+                        查看图片
+                      </Button>
+                    )}
+                    <Upload showUploadList={false} customRequest={handleUpload}>
+                      <div>
+                        <Button size="small">
+                          <UploadOutlined />
+                          添加图片
+                        </Button>
+                      </div>
+                    </Upload>
+                  </Space>
+                  {showPic ? (
+                    <div>
+                      <ProDescriptions column={1}>
+                        {picList.map((pic, key) => {
+                          return (
+                            <ProDescriptions.Item key={key} copyable={true} valueType="text">
+                              {`<img src="${pic}" alt="">`}
+                            </ProDescriptions.Item>
+                          );
+                        })}
+                      </ProDescriptions>
+                    </div>
+                  ) : (
+                    <></>
+                  )}
+                </div>
+              }
+            >
               <MdEditor
                 value={answerMd}
                 onChange={(value) => {

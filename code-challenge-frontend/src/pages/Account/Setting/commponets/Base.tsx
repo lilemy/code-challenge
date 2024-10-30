@@ -1,3 +1,4 @@
+import { uploadFile } from '@/services/code-challenge/fileController';
 import { getLoginUser, userEdit } from '@/services/code-challenge/userController';
 import { UploadOutlined } from '@ant-design/icons';
 import { ProFormText, ProFormTextArea } from '@ant-design/pro-components';
@@ -10,27 +11,10 @@ const BaseView: React.FC = () => {
   const { styles } = useStyles();
   const formRef = useRef<ProFormInstance>();
   const [loginUser, setLoginUser] = useState<API.LoginUserVO>();
+  const [userAvatarUrl, setUserAvatarUrl] = useState<string>();
   const [userMessageChange, setUserMessageChange] = useState<boolean>(false);
-  // 头像组件 方便以后独立，增加裁剪之类的功能
-  const AvatarView = ({ avatar }: { avatar: string }) => (
-    <>
-      <div className={styles.avatar_title}>头像</div>
-      <div className={styles.avatar}>
-        <img src={avatar} alt="avatar" />
-      </div>
-      <Upload showUploadList={false}>
-        <div className={styles.button_view}>
-          <Button disabled={true}>
-            <UploadOutlined />
-            更换头像
-          </Button>
-        </div>
-      </Upload>
-    </>
-  );
-  const handleFinish = async (value: API.LoginUserVO) => {
+  const handleFinish = async (value: API.UserEditRequest) => {
     try {
-      console.log(value);
       const res = await userEdit(value);
       message.success('更新信息成功');
       if (res.data) {
@@ -44,10 +28,54 @@ const BaseView: React.FC = () => {
     try {
       const res = await getLoginUser();
       setLoginUser(res.data);
+      setUserAvatarUrl(res.data?.userAvatar);
     } catch (e: any) {
       message.error('获取用户信息错误，' + e.message);
     }
   };
+  // 图片上传
+  const handleUpload = async (options: any) => {
+    const { file } = options;
+    // 构造请求参数
+    const params: API.uploadFileParams = {
+      uploadFileRequest: {
+        biz: 'user_avatar',
+        bizId: loginUser?.id,
+      },
+    };
+    // 使用 FormData 包装文件数据
+    const formData = new FormData();
+    formData.append('file', file);
+    try {
+      const res = await uploadFile(params, formData);
+      setUserAvatarUrl(res.data);
+      const avatarUrl: API.UserEditRequest = {
+        id: loginUser?.id,
+        userAvatar: res.data,
+      };
+      await handleFinish(avatarUrl);
+      message.success('头像上传成功');
+    } catch (e: any) {
+      message.error('头像上传失败，' + e.message);
+    }
+  };
+  // 头像组件 方便以后独立，增加裁剪之类的功能
+  const AvatarView = ({ avatar }: { avatar: string }) => (
+    <>
+      <div className={styles.avatar_title}>头像</div>
+      <div className={styles.avatar}>
+        <img src={avatar} alt="avatar" />
+      </div>
+      <Upload showUploadList={false} customRequest={handleUpload}>
+        <div className={styles.button_view}>
+          <Button>
+            <UploadOutlined />
+            更换头像
+          </Button>
+        </div>
+      </Upload>
+    </>
+  );
   useEffect(() => {
     getLoginUserMes().then(() => '');
   }, [userMessageChange]);
@@ -78,7 +106,7 @@ const BaseView: React.FC = () => {
         </ProForm>
       </div>
       <div className={styles.right}>
-        <AvatarView avatar={loginUser?.userAvatar || '/user.png'} />
+        <AvatarView avatar={userAvatarUrl || '/user.png'} />
       </div>
     </div>
   );
