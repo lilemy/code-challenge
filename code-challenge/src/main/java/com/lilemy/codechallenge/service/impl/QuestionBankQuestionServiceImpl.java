@@ -193,7 +193,7 @@ public class QuestionBankQuestionServiceImpl extends ServiceImpl<QuestionBankQue
         );
         // 保存所有批次任务
         List<CompletableFuture<Void>> futures = new ArrayList<>();
-        // 分批处理，避免长事务，假设每次处理 1000 条数据
+        // 分批处理，避免长事务，每次处理 1000 条数据
         int batchSize = 1000;
         int totalQuestionListSize = validQuestionIdList.size();
         for (int i = 0; i < totalQuestionListSize; i += batchSize) {

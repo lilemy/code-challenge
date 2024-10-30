@@ -12,6 +12,11 @@ spring:
       host: 192.168.37.129
       port: 6379
       timeout: 5000
+  # elasticsearch 配置
+  elasticsearch:
+    uris: http://192.168.37.129:9200
+    username: elastic
+    password: 123456
 # mybatis-plus配置
 mybatis-plus:
   configuration:
@@ -19,3 +24,8 @@ mybatis-plus:
 sa-token:
   token-name: tokendev
   is-log: true
+minio:
+  endpoint: http://192.168.37.129:9000
+  accessKey: lilemy
+  secretKey: 12345678
+  bucketName: code-challenge

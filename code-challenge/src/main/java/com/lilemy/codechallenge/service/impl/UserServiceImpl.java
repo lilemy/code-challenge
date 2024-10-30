@@ -142,9 +142,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         user.setEditTime(new Date());
         boolean result = this.updateById(user);
         ThrowUtils.throwIf(!result, ResultCode.OPERATION_ERROR);
-        // 记录用户的登录态
-        StpUtil.login(user.getId());
-        StpUtil.getTokenSession().set(UserConstant.USER_LOGIN_STATE, user);
         return true;
     }
 
