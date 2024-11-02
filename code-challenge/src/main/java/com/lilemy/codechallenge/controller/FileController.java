@@ -2,8 +2,8 @@ package com.lilemy.codechallenge.controller;
 
 import com.lilemy.codechallenge.common.BaseResponse;
 import com.lilemy.codechallenge.common.ResultUtils;
-import com.lilemy.codechallenge.manager.MinioManager;
 import com.lilemy.codechallenge.model.dto.file.UploadFileRequest;
+import com.lilemy.codechallenge.service.FileService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -21,12 +21,12 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileController {
 
     @Resource
-    private MinioManager minioManager;
+    private FileService fileService;
 
     @Operation(summary = "文件上传")
     @PostMapping("/upload")
-    public BaseResponse<String> uploadFile(@RequestParam("file") MultipartFile file,UploadFileRequest uploadFileRequest) {
-        String url = minioManager.uploadFile(file, uploadFileRequest);
+    public BaseResponse<String> uploadFile(@RequestParam("file") MultipartFile file, UploadFileRequest uploadFileRequest) {
+        String url = fileService.uploadFile(file, uploadFileRequest);
         return ResultUtils.success(url);
     }
 }

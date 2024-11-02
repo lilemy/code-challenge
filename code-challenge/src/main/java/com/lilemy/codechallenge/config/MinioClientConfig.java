@@ -6,10 +6,13 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+/**
+ * Minio对象存储客户端
+ */
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "minio")
-public class MinioConfig {
+public class MinioClientConfig {
 
     private String endpoint;
     private String accessKey;

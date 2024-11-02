@@ -3,7 +3,6 @@ package com.lilemy.codechallenge.controller;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.jd.platform.hotkey.client.callback.JdHotKeyStore;
 import com.lilemy.codechallenge.common.BaseResponse;
 import com.lilemy.codechallenge.common.DeleteRequest;
 import com.lilemy.codechallenge.common.ResultCode;
@@ -77,16 +76,16 @@ public class QuestionBankController {
     public BaseResponse<QuestionBankVO> getQuestionBankVOById(Long id, Boolean isNeedQueryQuestionList) {
         ThrowUtils.throwIf(id <= 0, ResultCode.PARAMS_ERROR);
         // 生成 key
-        String key = "bank_detail_" + id;
+//        String key = "bank_detail_" + id;
         // 如果是热 key
-        if (JdHotKeyStore.isHotKey(key)) {
-            // 从本地缓存中获取缓存值
-            Object cacheQuestionBankVO = JdHotKeyStore.get(key);
-            if (cacheQuestionBankVO != null) {
-                // 如果缓存中有值，直接返回缓存值
-                return ResultUtils.success((QuestionBankVO) cacheQuestionBankVO);
-            }
-        }
+//        if (JdHotKeyStore.isHotKey(key)) {
+//            // 从本地缓存中获取缓存值
+//            Object cacheQuestionBankVO = JdHotKeyStore.get(key);
+//            if (cacheQuestionBankVO != null) {
+//                // 如果缓存中有值，直接返回缓存值
+//                return ResultUtils.success((QuestionBankVO) cacheQuestionBankVO);
+//            }
+//        }
         // 查询数据库
         QuestionBank questionBank = questionBankService.getById(id);
         ThrowUtils.throwIf(questionBank == null, ResultCode.NOT_FOUND_ERROR);
@@ -100,7 +99,7 @@ public class QuestionBankController {
             questionBankVO.setQuestionPage(questionVOPage);
         }
         // 设置本地缓存
-        JdHotKeyStore.smartSet(key, questionBankVO);
+//        JdHotKeyStore.smartSet(key, questionBankVO);
         // 获取封装类
         return ResultUtils.success(questionBankVO);
     }
