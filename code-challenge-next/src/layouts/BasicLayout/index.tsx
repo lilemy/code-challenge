@@ -5,17 +5,20 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 import { ProLayout } from "@ant-design/pro-components";
-import { Dropdown, Input } from "antd";
+import { Dropdown, Input, message } from "antd";
 import React from "react";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import GlobalFooter from "@/components/GlobalFooter";
 import "./index.css";
-import { RootState } from "@/stores";
-import { useSelector } from "react-redux";
 import { menus } from "../../../config/menu";
 import getAccessibleMenus from "@/access/menuAccess";
+import { userLogout } from "@/api/userController";
+import { setLoginUser } from "@/stores/loginUser";
+import { DEFAULT_USER } from "@/constants/user";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "@/stores";
 
 const SearchInput = () => {
   return (
@@ -52,8 +55,24 @@ interface Props {
 export default function BasicLayout({ children }: Props) {
   const pathname = usePathname();
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
   // 获得登录用户信息
   const loginUser = useSelector((state: RootState) => state.loginUser);
+  /**
+   * 用户注销
+   */
+  const doUserLogout = async () => {
+    try {
+      await userLogout();
+      message.success("已退出登录");
+      dispatch(setLoginUser(DEFAULT_USER));
+      router.push("/user/login");
+    } catch (e: any) {
+      message.error("操作失败，" + e.message);
+    }
+    return;
+  };
+
   return (
     <div
       id="basicLayout"
@@ -81,7 +100,7 @@ export default function BasicLayout({ children }: Props) {
           size: "small",
           title: loginUser.username || "未命名",
           render: (_, dom) => {
-            return (
+            return loginUser.id ? (
               <Dropdown
                 menu={{
                   items: [
@@ -91,10 +110,19 @@ export default function BasicLayout({ children }: Props) {
                       label: "退出登录",
                     },
                   ],
+                  onClick: async (event: { key: React.Key }) => {
+                    const { key } = event;
+                    // 退出登录
+                    if (key === "logout") {
+                      await doUserLogout();
+                    }
+                  },
                 }}
               >
                 {dom}
               </Dropdown>
+            ) : (
+              <div onClick={() => router.push("/user/login")}>{dom}</div>
             );
           },
         }}

@@ -6,12 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "openapi": "node openapi.config.ts",
+    "openapi": "ts-node openapi.config.ts",
     "lint": "next lint"
   },
   "dependencies": {
     "@ant-design/nextjs-registry": "^1.0.1",
     "@ant-design/pro-components": "^2.8.1",
+    "@ant-design/pro-form": "^2.31.1",
     "@bytemd/plugin-gfm": "^1.21.0",
     "@bytemd/plugin-highlight": "^1.21.0",
     "@bytemd/react": "^1.21.0",
