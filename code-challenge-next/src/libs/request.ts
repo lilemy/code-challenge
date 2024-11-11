@@ -1,8 +1,11 @@
 import axios from "axios";
+import { BACKEND_HOST_DEV, BACKEND_HOST_PROD } from "@/constants/baseUrl";
+
+const isDev = process.env.NODE_ENV === "development";
 
 // 创建 Axios 示例
 const myAxios = axios.create({
-  baseURL: "http://localhost:8080/api",
+  baseURL: isDev ? BACKEND_HOST_DEV : BACKEND_HOST_PROD,
   timeout: 10000,
   withCredentials: true,
 });
@@ -24,15 +27,20 @@ myAxios.interceptors.response.use(
   // 2xx 响应触发
   function (response) {
     // 处理响应数据
-    const { data } = response;
+    const { data } = response as unknown as BaseResponse<any>;
+    if (!data) {
+      throw new Error("服务异常");
+    }
     // 未登录
     if (data.code === 40100) {
       // 不是获取用户信息接口，或者不是登录页面，则跳转到登录页面
       if (
         !response.request.responseURL.includes("user/get/login") &&
+        !response.request.responseURL.includes("user/add/sign_in") &&
         !window.location.pathname.includes("/user/login")
       ) {
         window.location.href = `/user/login?redirect=${window.location.href}`;
+        throw new Error("请先登录");
       }
     } else if (data.code !== 0) {
       // 其他错误
