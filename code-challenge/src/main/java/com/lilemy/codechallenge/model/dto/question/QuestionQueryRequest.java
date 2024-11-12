@@ -61,4 +61,9 @@ public class QuestionQueryRequest extends PageRequest implements Serializable {
      * 创建用户 id
      */
     private Long userId;
+
+    /**
+     * 是否要展示内容
+     */
+    private boolean needAnswer;
 }

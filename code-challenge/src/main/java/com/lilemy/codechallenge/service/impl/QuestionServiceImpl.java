@@ -263,6 +263,14 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
         Long userId = questionQueryRequest.getUserId();
         String answer = questionQueryRequest.getAnswer();
         String underlineSortField = StrUtil.toUnderlineCase(sortField);
+        // 是否需要题目答案
+        boolean needAnswer = questionQueryRequest.isNeedAnswer();
+        if (!needAnswer) {
+            queryWrapper.select("id", "title", "tags", "content", "user_id",
+                    "review_status", "review_message", "review_time", "reviewer_id",
+                    "view_num", "thumb_num", "favour_num", "priority",
+                    "edit_time", "create_time", "update_time");
+        }
         // 从多字段中搜索
         if (StringUtils.isNotBlank(searchText)) {
             // 需要拼接查询条件
@@ -450,21 +458,21 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
         // 分页
         /**
          * PageRequest pageRequest = PageRequest.of(current, pageSize);
-        NativeQuery searchQuery = new NativeQueryBuilder()
-                .withQuery()
-                .withPageable(pageRequest)
-                .build();
-        SearchHits<QuestionEsDTO> searchHits = elasticsearchTemplate.search(searchQuery, QuestionEsDTO.class);
-        Page<Question> page = new Page<>();
-        page.setTotal(searchHits.getTotalHits());
-        List<Question> resourceList = new ArrayList<>();
-        if (searchHits.hasSearchHits()) {
-            List<SearchHit<QuestionEsDTO>> searchHitList = searchHits.getSearchHits();
-            for (SearchHit<QuestionEsDTO> questionEsDTOSearchHit : searchHitList) {
-                resourceList.add(QuestionEsDTO.dtoToObj(questionEsDTOSearchHit.getContent()));
-            }
-        }
-        page.setRecords(resourceList);*/
+         NativeQuery searchQuery = new NativeQueryBuilder()
+         .withQuery()
+         .withPageable(pageRequest)
+         .build();
+         SearchHits<QuestionEsDTO> searchHits = elasticsearchTemplate.search(searchQuery, QuestionEsDTO.class);
+         Page<Question> page = new Page<>();
+         page.setTotal(searchHits.getTotalHits());
+         List<Question> resourceList = new ArrayList<>();
+         if (searchHits.hasSearchHits()) {
+         List<SearchHit<QuestionEsDTO>> searchHitList = searchHits.getSearchHits();
+         for (SearchHit<QuestionEsDTO> questionEsDTOSearchHit : searchHitList) {
+         resourceList.add(QuestionEsDTO.dtoToObj(questionEsDTOSearchHit.getContent()));
+         }
+         }
+         page.setRecords(resourceList);*/
         return null;
     }
 

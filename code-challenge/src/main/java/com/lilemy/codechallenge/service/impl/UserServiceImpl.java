@@ -114,12 +114,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
         queryWrapper.eq(User::getUserAccount, userAccount);
         User user = this.getOne(queryWrapper);
         // 用户不存在
-        if (user == null) {
-            throw new BusinessException(ResultCode.PARAMS_ERROR, "用户不存在");
-        }
-        if (!encryptPassword.equals(user.getUserPassword())) {
-            throw new BusinessException(ResultCode.PARAMS_ERROR, "密码错误");
-        }
+        ThrowUtils.throwIf(user == null, ResultCode.PARAMS_ERROR, "用户不存在");
+        // 密码是否匹配
+        ThrowUtils.throwIf(!encryptPassword.equals(user.getUserPassword()), ResultCode.PARAMS_ERROR, "密码错误");
+        // 判断用户是否被封号
+        ThrowUtils.throwIf(user.getUserRole().equals(UserConstant.BAN_ROLE), ResultCode.NO_AUTH_ERROR, "您已被封号，请联系管理员！");
         // 记录用户的登录态，指定设备，同端登录互斥
         StpUtil.login(user.getId(), DeviceUtils.getRequestDevice(request));
         StpUtil.getTokenSession().set(UserConstant.USER_LOGIN_STATE, user);
