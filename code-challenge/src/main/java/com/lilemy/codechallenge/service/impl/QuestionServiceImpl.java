@@ -70,6 +70,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
         // 从对象中取值
         String title = question.getTitle();
         String content = question.getContent();
+        String answer = question.getAnswer();
         // 创建数据时，参数不能为空
         if (add) {
             ThrowUtils.throwIf(StringUtils.isBlank(title), ResultCode.PARAMS_ERROR);
@@ -78,9 +79,13 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
         if (StringUtils.isNotBlank(title)) {
             ThrowUtils.throwIf(title.length() > 80, ResultCode.PARAMS_ERROR, "标题过长");
         }
-        if (StringUtils.isNotBlank(content)) {
-            ThrowUtils.throwIf(content.length() > 10240, ResultCode.PARAMS_ERROR, "内容过长");
+        if (StringUtils.isNotBlank(answer)) {
+            ThrowUtils.throwIf(answer.length() > 10240, ResultCode.PARAMS_ERROR, "推荐答案过长");
         }
+        if (StringUtils.isNotBlank(content)) {
+            ThrowUtils.throwIf(content.length() > 5012, ResultCode.PARAMS_ERROR, "内容过长");
+        }
+
     }
 
     @Override
@@ -146,6 +151,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
         }
         // 操作数据库
         boolean result = this.removeById(deleteRequestId);
+        // todo 添加关联删除（删除题目题库关联信息）
         ThrowUtils.throwIf(!result, ResultCode.OPERATION_ERROR);
         return true;
     }
@@ -198,7 +204,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
                     .toList();
             questionBankQuestionService.saveBatch(questionBankQuestionList);
         }
-        // 获取需要添加的题目题库关联
+        // 获取需要删除的题目题库关联
         List<Long> deleteIdList = new ArrayList<>(bankIds);
         deleteIdList.removeAll(questionBankList);
         if (CollUtil.isNotEmpty(deleteIdList)) {
@@ -269,7 +275,7 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
             queryWrapper.select("id", "title", "tags", "content", "user_id",
                     "review_status", "review_message", "review_time", "reviewer_id",
                     "view_num", "thumb_num", "favour_num", "priority",
-                    "edit_time", "create_time", "update_time");
+                    "edit_time", "create_time", "update_time", "is_delete");
         }
         // 从多字段中搜索
         if (StringUtils.isNotBlank(searchText)) {
