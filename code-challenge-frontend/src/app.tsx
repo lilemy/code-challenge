@@ -1,5 +1,6 @@
-import { AvatarDropdown, Footer } from '@/components';
+import { AvatarDropdown, Footer, SearchInput } from '@/components';
 import { getLoginUser } from '@/services/code-challenge/userController';
+import { GithubFilled } from '@ant-design/icons';
 import type { RunTimeLayoutConfig } from '@umijs/max';
 import { history } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
@@ -37,6 +38,15 @@ export const layout: RunTimeLayoutConfig = ({ initialState }) => {
       content: initialState?.currentUser?.username,
     },
     footerRender: () => <Footer />,
+    actionsRender: (props) => {
+      if (props.isMobile) return [];
+      return [
+        <SearchInput key="search" />,
+        <a key="github" href="https://github.com/lilemy" target="_blank" rel="noreferrer">
+          <GithubFilled key="GithubFilled" />
+        </a>,
+      ];
+    },
     menuHeaderRender: undefined,
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,

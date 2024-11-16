@@ -1,38 +1,35 @@
 import MdEditor from '@/components/Markdown/MdEditor';
 import TagList from '@/components/TagList';
-import CreateForm from '@/pages/Admin/Question/components/CreateForm';
-import UpdateBankModal from '@/pages/Admin/Question/components/UpdateBankModal';
-import UpdateForm from '@/pages/Admin/Question/components/UpdateForm';
-import { deleteQuestion, listQuestionByPage } from '@/services/code-challenge/questionController';
+import CreateForm from '@/pages/Admin/Note/components/CreateForm';
+import UpdateForm from '@/pages/Admin/Note/components/UpdateForm';
+import { deleteNote, listNoteByPage } from '@/services/code-challenge/noteController';
 import { Link } from '@@/exports';
 import { EditOutlined, PlusOutlined } from '@ant-design/icons';
-import { type ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
+import { ActionType, PageContainer, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Button, message, Space, Typography } from 'antd';
 import React, { useRef, useState } from 'react';
 
-const QuestionTableList: React.FC = () => {
+const NoteTableList: React.FC = () => {
   // 是否显示新建窗口
   const [createModalVisible, setCreateModalVisible] = useState<boolean>(false);
   // 是否显示更新窗口
   const [updateModalVisible, setUpdateModalVisible] = useState<boolean>(false);
-  // 是否显示更新所属题库的弹窗
-  const [updateBankModalVisible, setUpdateBankModalVisible] = useState<boolean>(false);
   const actionRef = useRef<ActionType>();
-  // 当前题目的数据
-  const [currentRow, setCurrentRow] = useState<API.Question>();
+  const [currentRow, setCurrentRow] = useState<API.Note>();
 
   /**
    * @zh-CN 删除题目
    *
-   * @param question
+   * @param note
    */
-  const handleDelete = async (question: API.Question) => {
+  const handleDelete = async (note: API.Note) => {
     const hide = message.loading('正在删除');
-    if (!question) return true;
+    if (!note) return true;
     try {
-      await deleteQuestion({
-        id: question.id,
+      await deleteNote({
+        id: note.id,
       });
+      console.log(note);
       hide();
       message.success('删除成功');
       actionRef?.current?.reload();
@@ -44,19 +41,13 @@ const QuestionTableList: React.FC = () => {
     }
   };
 
-  const columns: ProColumns<API.Question>[] = [
+  const columns: ProColumns<API.Note>[] = [
     {
       title: 'id',
       dataIndex: 'id',
       valueType: 'text',
       hideInForm: true,
       width: 160,
-    },
-    {
-      title: '所属题库',
-      dataIndex: 'questionBankId',
-      hideInTable: true,
-      hideInForm: true,
     },
     {
       title: '标题',
@@ -66,17 +57,6 @@ const QuestionTableList: React.FC = () => {
     {
       title: '内容',
       dataIndex: 'content',
-      valueType: 'text',
-      hideInSearch: true,
-      width: 640,
-      renderFormItem: (_, { value }) => {
-        // value 和 onchange 会通过 form 自动注入
-        return <MdEditor {...value} />;
-      },
-    },
-    {
-      title: '答案',
-      dataIndex: 'answer',
       valueType: 'text',
       hideInSearch: true,
       width: 640,
@@ -136,14 +116,6 @@ const QuestionTableList: React.FC = () => {
           <Typography.Link
             onClick={() => {
               setCurrentRow(record);
-              setUpdateBankModalVisible(true);
-            }}
-          >
-            修改所属题库
-          </Typography.Link>
-          <Typography.Link
-            onClick={() => {
-              setCurrentRow(record);
               setUpdateModalVisible(true);
             }}
           >
@@ -159,8 +131,8 @@ const QuestionTableList: React.FC = () => {
 
   return (
     <PageContainer>
-      <ProTable<API.Question, API.PageQuestion>
-        headerTitle={'题目信息'}
+      <ProTable<API.Note, API.PageNote>
+        headerTitle={'笔记信息'}
         actionRef={actionRef}
         rowKey="id"
         search={{
@@ -177,7 +149,7 @@ const QuestionTableList: React.FC = () => {
           >
             <PlusOutlined /> 新建
           </Button>,
-          <Link key="review" to="/admin/review/questions">
+          <Link key="review" to="/admin/review/notes">
             <Button type="primary">
               <EditOutlined /> 审核
             </Button>
@@ -186,13 +158,13 @@ const QuestionTableList: React.FC = () => {
         request={async (params, sort, filter) => {
           const sortField = Object.keys(sort)?.[0];
           const sortOrder = sort?.[sortField] ?? undefined;
-          const { data, code } = await listQuestionByPage({
+          const { data, code } = await listNoteByPage({
             needAnswer: true,
             ...params,
             sortField,
             sortOrder,
             ...filter,
-          } as API.QuestionQueryRequest);
+          } as API.NoteQueryRequest);
           return {
             success: code === 0,
             data: data?.records || [],
@@ -224,16 +196,8 @@ const QuestionTableList: React.FC = () => {
           setUpdateModalVisible(false);
         }}
       />
-      <UpdateBankModal
-        questionTitle={currentRow?.title}
-        questionId={currentRow?.id}
-        visible={updateBankModalVisible}
-        onCancel={() => {
-          setUpdateBankModalVisible(false);
-        }}
-      />
     </PageContainer>
   );
 };
 
-export default QuestionTableList;
+export default NoteTableList;

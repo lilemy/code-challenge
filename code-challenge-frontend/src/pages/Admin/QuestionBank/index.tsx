@@ -175,6 +175,7 @@ const QuestionBankTableList: React.FC = () => {
           const sortField = Object.keys(sort)?.[0];
           const sortOrder = sort?.[sortField] ?? undefined;
           const { data, code } = await listQuestionBankByPage({
+            needAnswer: true,
             ...params,
             sortField,
             sortOrder,

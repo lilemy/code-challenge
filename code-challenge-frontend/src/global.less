@@ -62,3 +62,15 @@ ol {
     }
   }
 }
+
+/* 修改导航栏菜单颜色 */
+.ant-menu-item-selected::after {
+  border-bottom: 3px solid rgba(24, 220, 255) !important;
+  //background-color: rgba(24, 220, 255, 0.5) !important; /* 修改选中的背景颜色 */
+  //color: white !important; /* 修改选中的字体颜色 */
+}
+
+.ant-menu-item:hover::after {
+  border-bottom: 2px solid rgba(24, 220, 255, 0.7) !important; /* 修改 hover 状态的背景颜色 */
+}
+

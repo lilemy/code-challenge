@@ -1,35 +1,44 @@
 import MdEditor from '@/components/Markdown/MdEditor';
-import { getQuestionBankList } from '@/services/code-challenge/questionBankController';
-import { createQuestion } from '@/services/code-challenge/questionController';
-import { ProFormSelect, ProFormText } from '@ant-design/pro-components';
+import { listCategoriesVoByPage } from '@/services/code-challenge/categoriesController';
+import { createNote } from '@/services/code-challenge/noteController';
+import {
+  ProFormRadio,
+  ProFormSelect,
+  ProFormSwitch,
+  ProFormText,
+} from '@ant-design/pro-components';
 import { ProForm, ProFormInstance } from '@ant-design/pro-form/lib';
 import { Card, Input, message, Tag } from 'antd';
 import React, { useEffect, useRef, useState } from 'react';
 
-const QuestionCreate: React.FC = () => {
-  const [loading, setLoading] = useState<boolean>(true);
-  const [questionBankList, setQuestionBankList] = useState<API.QuestionBankListVO[]>([]);
+const NoteCreate: React.FC = () => {
+  // 笔记分类列表
+  const [categoriesList, setCategoriesList] = useState<API.CategoriesVO[]>([]);
+  // 加载
+  const [loading, setLoading] = useState<boolean>(false);
   const [contentMd, setContentMd] = useState<string>('');
-  const [answerMd, setAnswerMd] = useState<string>('');
   const formRef = useRef<ProFormInstance>();
   const [tags, setTags] = useState<string[]>([]);
   const [inputValue, setInputValue] = useState('');
-  const loadQuestionBankList = async () => {
+  const loadCategoriesList = async () => {
     setLoading(true);
     try {
-      const res = await getQuestionBankList();
-      setQuestionBankList(res.data || []);
+      const res = await listCategoriesVoByPage({
+        sortField: 'priority',
+        sortOrder: 'descend',
+      });
+      setCategoriesList(res.data?.records ?? []);
     } catch (e: any) {
-      message.error('获取题库失败，' + e.message);
+      message.error('获取笔记分类失败，' + e.message);
     }
     setLoading(false);
   };
   useEffect(() => {
-    loadQuestionBankList().then(() => '');
+    loadCategoriesList().then(() => '');
   }, []);
-  const questionBankListForm = questionBankList.map((questionBank) => ({
-    value: questionBank.id,
-    label: questionBank.title,
+  const categoriesListForm = categoriesList.map((categoriesVO) => ({
+    value: categoriesVO.id,
+    label: categoriesVO.name,
   }));
 
   // 回车时添加标签
@@ -44,25 +53,23 @@ const QuestionCreate: React.FC = () => {
   const handleClose = (removedTag: any) => {
     setTags(tags.filter((tag) => tag !== removedTag));
   };
-
-  const onSubmitFrom = async (value: API.QuestionCreateRequest, tags: string[]) => {
+  const onSubmitFrom = async (value: API.NoteCreateRequest, tags: string[]) => {
     setLoading(true);
     try {
-      await createQuestion({
+      await createNote({
         ...value,
         tags: tags,
+        isTop: value.isTop ? 1 : 0,
       });
-      message.success('新题目创建成功，等待管理员审核');
+      message.success('新笔记创建成功，等待管理员审核');
       formRef.current?.resetFields();
     } catch (e: any) {
       message.error('创建失败，' + e.message);
     }
-    setAnswerMd('');
     setContentMd('');
     setTags([]);
     setLoading(false);
   };
-
   return (
     <div className="max-width-content">
       <Card loading={loading}>
@@ -75,17 +82,17 @@ const QuestionCreate: React.FC = () => {
           formRef={formRef}
         >
           <ProFormText
-            label="题目标题："
+            label="笔记标题："
             name="title"
-            rules={[{ required: true, message: '请输入题目标题' }]}
+            rules={[{ required: true, message: '请输入笔记标题' }]}
           />
           <ProFormSelect
-            name="questionBankIds"
-            label="所属题库"
+            name="categoriesIds"
+            label="所属版块"
             mode="multiple"
-            options={questionBankListForm}
+            options={categoriesListForm}
           />
-          <ProFormText label="题目内容：" name="content">
+          <ProFormText label="笔记内容：" name="content">
             <MdEditor
               value={contentMd}
               onChange={(value) => {
@@ -94,21 +101,29 @@ const QuestionCreate: React.FC = () => {
               }}
             />
           </ProFormText>
-          <ProFormText
-            tooltip="暂不支持创建题目时添加图片，请创建题目成功后在修改题目页面添加"
-            label="推荐答案："
-            name="answer"
-            rules={[{ required: true, message: '请输入题目推荐答案' }]}
-          >
-            <MdEditor
-              value={answerMd}
-              onChange={(value) => {
-                formRef.current?.setFieldsValue({ answer: value });
-                setAnswerMd(value);
-              }}
-            />
-          </ProFormText>
-          <ProForm.Item label="题目标签：" name="tags">
+          <ProFormRadio.Group
+            name="visible"
+            label="可见范围："
+            radioType="button"
+            initialValue={0}
+            options={[
+              {
+                label: '公开',
+                value: 0,
+              },
+              {
+                label: '仅自己可见',
+                value: 1,
+              },
+            ]}
+          />
+          <ProFormSwitch
+            label="是否置顶"
+            name="isTop"
+            checkedChildren="置顶"
+            unCheckedChildren="不置顶"
+          />
+          <ProForm.Item label="笔记标签：" name="tags">
             {tags.map((tag) => (
               <Tag
                 onChange={() => formRef.current?.setFieldsValue({ tags: tags })}
@@ -120,6 +135,7 @@ const QuestionCreate: React.FC = () => {
               </Tag>
             ))}
             <Input
+              size="small"
               value={inputValue}
               onChange={(e) => {
                 setInputValue(e.target.value);
@@ -136,4 +152,4 @@ const QuestionCreate: React.FC = () => {
   );
 };
 
-export default QuestionCreate;
+export default NoteCreate;

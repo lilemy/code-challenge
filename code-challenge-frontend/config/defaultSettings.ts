@@ -8,13 +8,13 @@ const Settings: ProLayoutProps & {
 } = {
   navTheme: 'light',
   // 拂晓蓝
-  colorPrimary: '#1890ff',
+  colorPrimary: '#18DCFFFF',
   layout: 'top',
   contentWidth: 'Fluid',
   fixedHeader: false,
   fixSiderbar: true,
   colorWeak: false,
-  title: '小新刷题平台',
+  title: '小新知识分享平台',
   pwa: true,
   iconfontUrl: '',
 };

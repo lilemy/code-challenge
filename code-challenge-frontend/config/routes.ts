@@ -12,6 +12,7 @@ export default [
     ],
   },
   { path: '/welcome', name: '欢迎', icon: 'smile', component: './Welcome' },
+  { path: '/search', name: '搜索', component: './Search', hideInMenu: true },
   { path: '/banks', name: '题库', icon: 'table', component: './Bank' },
   {
     path: '/bank/:questionBankId',
@@ -45,6 +46,24 @@ export default [
     hideInMenu: true,
   },
   {
+    path: '/notes',
+    name: '笔记',
+    icon: 'read',
+    component: './Note',
+  },
+  {
+    path: '/note/:noteId',
+    name: '笔记详情',
+    component: './Note/NoteDetail',
+    hideInMenu: true,
+  },
+  {
+    path: '/note/create',
+    name: '创建笔记',
+    component: './Note/NoteCreate',
+    hideInMenu: true,
+  },
+  {
     path: 'account/center',
     name: '个人中心',
     component: './Account/Center',
@@ -70,6 +89,13 @@ export default [
         path: '/admin/review/questions',
         name: '题目审核',
         component: './Admin/Review/Question',
+        hideInMenu: true,
+      },
+      { path: '/admin/note', name: '笔记管理', component: './Admin/Note' },
+      {
+        path: '/admin/review/notes',
+        name: '笔记审核',
+        component: './Admin/Review/Note',
         hideInMenu: true,
       },
     ],

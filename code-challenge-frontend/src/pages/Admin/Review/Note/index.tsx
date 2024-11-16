@@ -1,15 +1,15 @@
-import ReviewModal from '@/pages/Admin/Review/Question/components/ReviewModal';
-import { listReviewingQuestionByPage } from '@/services/code-challenge/questionController';
+import ReviewModal from '@/pages/Admin/Review/Note/components/ReviewModal';
+import { listReviewingNoteByPage } from '@/services/code-challenge/noteController';
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
 import { Space, Typography } from 'antd';
 import Title from 'antd/es/typography/Title';
 import React, { useRef, useState } from 'react';
 
 /**
- * 题目审核页面
+ * 笔记审核页面
  * @constructor
  */
-const ReviewQuestion: React.FC = () => {
+const ReviewNote: React.FC = () => {
   const actionRef = useRef<ActionType>();
   // 审核题目窗口
   const [reviewModalVisible, setReviewModalVisible] = useState<boolean>(false);
@@ -18,7 +18,7 @@ const ReviewQuestion: React.FC = () => {
   /**
    * 表格列配置
    */
-  const columns: ProColumns<API.Question>[] = [
+  const columns: ProColumns<API.Note>[] = [
     {
       title: 'id',
       dataIndex: 'id',
@@ -55,8 +55,8 @@ const ReviewQuestion: React.FC = () => {
   ];
   return (
     <div className="max-width-content">
-      <Title level={4}>审核题目</Title>
-      <ProTable<API.Question, API.PageQuestion>
+      <Title level={4}>审核笔记</Title>
+      <ProTable<API.Note, API.PageNote>
         actionRef={actionRef}
         rowKey="id"
         search={{
@@ -68,13 +68,13 @@ const ReviewQuestion: React.FC = () => {
         request={async (params, sort, filter) => {
           const sortField = Object.keys(sort)?.[0];
           const sortOrder = sort?.[sortField] ?? undefined;
-          const { data, code } = await listReviewingQuestionByPage({
-            needAnswer: true,
+          const { data, code } = await listReviewingNoteByPage({
+            needContent: true,
             ...params,
             sortField,
             sortOrder,
             ...filter,
-          } as API.QuestionQueryRequest);
+          } as API.NoteQueryRequest);
           return {
             success: code === 0,
             data: data?.records || [],
@@ -97,4 +97,4 @@ const ReviewQuestion: React.FC = () => {
   );
 };
 
-export default ReviewQuestion;
+export default ReviewNote;

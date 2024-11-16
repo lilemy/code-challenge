@@ -1,5 +1,7 @@
+import NoteList from '@/components/NoteList';
 import QuestionBankList from '@/components/QuestionBankList';
 import QuestionList from '@/components/QuestionList';
+import { listNoteVoByPage } from '@/services/code-challenge/noteController';
 import { listQuestionBankVoByPage } from '@/services/code-challenge/questionBankController';
 import { listQuestionVoByPage } from '@/services/code-challenge/questionController';
 import { Link } from '@@/exports';
@@ -16,10 +18,23 @@ const Welcome: React.FC = () => {
   const [questionBankList, setQuestionBankList] = useState<API.QuestionBankVO[]>([]);
   // 题目列表
   const [questionList, setQuestionList] = useState<API.QuestionVO[]>([]);
+  // 笔记列表
+  const [noteList, setNoteList] = useState<API.NoteVO[]>([]);
   const [loading, setLoading] = useState(false);
 
   const loadData = async () => {
     setLoading(true);
+    // 获取笔记
+    try {
+      const res = await listNoteVoByPage({
+        pageSize: 8,
+        sortField: 'createTime',
+        sortOrder: 'descend',
+      });
+      setNoteList(res.data?.records ?? []);
+    } catch (e: any) {
+      message.error('获取笔记列表失败，' + e.message);
+    }
     // 获取题库
     try {
       const res = await listQuestionBankVoByPage({
@@ -50,6 +65,12 @@ const Welcome: React.FC = () => {
   }, []);
   return (
     <Card loading={loading} className="max-width-content">
+      <Flex justify="space-between" align="center">
+        <Title level={3}>最新笔记</Title>
+        <Link to={'/notes'}>查看更多</Link>
+      </Flex>
+      <NoteList noteList={noteList} />
+      <Divider />
       <Flex justify="space-between" align="center">
         <Title level={3}>最新题库</Title>
         <Link to={'/banks'}>查看更多</Link>

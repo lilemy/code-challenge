@@ -98,7 +98,7 @@ const Login: React.FC = () => {
               maxWidth: '75vw',
             }}
             logo={<img alt="logo" src="/logo.svg" />}
-            title="小新刷题平台"
+            title="小新知识分享平台"
             subTitle={''}
             initialValues={{
               autoLogin: true,

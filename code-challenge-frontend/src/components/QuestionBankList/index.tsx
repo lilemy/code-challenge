@@ -14,7 +14,7 @@ const QuestionBankList = (props: Props) => {
   const { questionBankList = [] } = props;
   const questionBankView = (questionBank: API.QuestionBankVO) => {
     return (
-      <Card>
+      <Card hoverable>
         <Link to={`/bank/${questionBank.id}`}>
           <Card.Meta
             avatar={<Avatar src={questionBank.picture} />}

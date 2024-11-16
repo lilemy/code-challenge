@@ -29,6 +29,30 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseNoteVO = {
+    code?: number;
+    data?: NoteVO;
+    message?: string;
+  };
+
+  type BaseResponsePageCategoriesVO = {
+    code?: number;
+    data?: PageCategoriesVO;
+    message?: string;
+  };
+
+  type BaseResponsePageNote = {
+    code?: number;
+    data?: PageNote;
+    message?: string;
+  };
+
+  type BaseResponsePageNoteVO = {
+    code?: number;
+    data?: PageNoteVO;
+    message?: string;
+  };
+
   type BaseResponsePageQuestion = {
     code?: number;
     data?: PageQuestion;
@@ -119,8 +143,34 @@ declare namespace API {
     message?: string;
   };
 
+  type CategoriesCreateRequest = {
+    name?: string;
+  };
+
+  type CategoriesQueryRequest = {
+    current?: number;
+    pageSize?: number;
+    sortField?: string;
+    sortOrder?: string;
+    id?: number;
+    notId?: number;
+    name?: string;
+  };
+
+  type CategoriesVO = {
+    id?: number;
+    name?: string;
+    priority?: number;
+    createTime?: string;
+    updateTime?: string;
+  };
+
   type DeleteRequest = {
     id?: number;
+  };
+
+  type getNoteVOByIdParams = {
+    id: number;
   };
 
   type getQuestionBankQuestionVOByIdParams = {
@@ -164,9 +214,159 @@ declare namespace API {
     createTime?: string;
   };
 
+  type Note = {
+    id?: number;
+    title?: string;
+    content?: string;
+    tags?: string;
+    picture?: string;
+    thumbNum?: number;
+    favourNum?: number;
+    viewNum?: number;
+    reviewStatus?: number;
+    reviewMessage?: string;
+    reviewerId?: number;
+    reviewTime?: string;
+    userId?: number;
+    visible?: number;
+    isTop?: number;
+    editTime?: string;
+    createTime?: string;
+    updateTime?: string;
+    isDelete?: number;
+  };
+
+  type NoteAddRequest = {
+    title?: string;
+    content?: string;
+    tags?: string[];
+    picture?: string;
+    categoriesList?: number[];
+  };
+
+  type NoteCreateRequest = {
+    title?: string;
+    content?: string;
+    tags?: string[];
+    picture?: string;
+    visible?: number;
+    isTop?: number;
+    categoriesList?: number[];
+  };
+
+  type NoteEditRequest = {
+    id?: number;
+    title?: string;
+    content?: string;
+    tags?: string[];
+    picture?: string;
+    visible?: number;
+    isTop?: number;
+    categoriesList?: number[];
+  };
+
+  type NoteQueryByCategoriesRequest = {
+    current?: number;
+    pageSize?: number;
+    sortField?: string;
+    sortOrder?: string;
+    categoriesId?: number;
+  };
+
+  type NoteQueryRequest = {
+    current?: number;
+    pageSize?: number;
+    sortField?: string;
+    sortOrder?: string;
+    id?: number;
+    notId?: number;
+    searchText?: string;
+    title?: string;
+    content?: string;
+    tags?: string[];
+    thumbNum?: number;
+    favourNum?: number;
+    viewNum?: number;
+    userId?: number;
+    visible?: number;
+    needContent?: boolean;
+  };
+
+  type NoteReviewRequest = {
+    id?: number;
+    reviewStatus?: number;
+    reviewMessage?: string;
+  };
+
+  type NoteUpdateRequest = {
+    id?: number;
+    title?: string;
+    content?: string;
+    tags?: string[];
+    picture?: string;
+    categoriesList?: number[];
+  };
+
+  type NoteVO = {
+    id?: number;
+    title?: string;
+    content?: string;
+    picture?: string;
+    thumbNum?: number;
+    favourNum?: number;
+    viewNum?: number;
+    createTime?: string;
+    updateTime?: string;
+    tagList?: string[];
+    userId?: number;
+    user?: UserVO;
+  };
+
   type OrderItem = {
     column?: string;
     asc?: boolean;
+  };
+
+  type PageCategoriesVO = {
+    records?: CategoriesVO[];
+    total?: number;
+    size?: number;
+    current?: number;
+    orders?: OrderItem[];
+    optimizeCountSql?: PageCategoriesVO;
+    searchCount?: PageCategoriesVO;
+    optimizeJoinOfCountSql?: boolean;
+    maxLimit?: number;
+    countId?: string;
+    pages?: number;
+  };
+
+  type PageNote = {
+    records?: Note[];
+    total?: number;
+    size?: number;
+    current?: number;
+    orders?: OrderItem[];
+    optimizeCountSql?: PageNote;
+    searchCount?: PageNote;
+    optimizeJoinOfCountSql?: boolean;
+    maxLimit?: number;
+    countId?: string;
+    pages?: number;
+  };
+
+  type PageNoteVO = {
+    records?: NoteVO[];
+    total?: number;
+    size?: number;
+    current?: number;
+    orders?: OrderItem[];
+    optimizeCountSql?: PageNoteVO;
+    searchCount?: PageNoteVO;
+    optimizeJoinOfCountSql?: boolean;
+    maxLimit?: number;
+    countId?: string;
+    pages?: number;
   };
 
   type PageQuestion = {
@@ -465,6 +665,7 @@ declare namespace API {
     answer?: string;
     questionBankId?: number;
     userId?: number;
+    needAnswer?: boolean;
   };
 
   type QuestionReviewRequest = {
