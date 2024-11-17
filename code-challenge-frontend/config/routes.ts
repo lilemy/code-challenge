@@ -63,6 +63,13 @@ export default [
     component: './Note/NoteCreate',
     hideInMenu: true,
   },
+
+  {
+    path: '/note/personal/:noteId',
+    name: '个人笔记详情',
+    component: './Note/NotePersonal',
+    hideInMenu: true,
+  },
   {
     path: 'account/center',
     name: '个人中心',

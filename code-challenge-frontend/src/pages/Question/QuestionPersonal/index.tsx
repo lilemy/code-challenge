@@ -17,7 +17,7 @@ import React, { useEffect, useRef, useState } from 'react';
 /**
  * 个人题目详情页
  */
-const QuestionPersonal: React.FC = () => {
+const QuestionPersonalPage: React.FC = () => {
   const params = useParams();
   const { questionId } = params;
   const [question, setQuestion] = useState<API.QuestionPersonalVO>({});
@@ -356,4 +356,4 @@ const QuestionPersonal: React.FC = () => {
   );
 };
 
-export default QuestionPersonal;
+export default QuestionPersonalPage;

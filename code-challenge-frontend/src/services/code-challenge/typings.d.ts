@@ -29,6 +29,12 @@ declare namespace API {
     message?: string;
   };
 
+  type BaseResponseNotePersonalVO = {
+    code?: number;
+    data?: NotePersonalVO;
+    message?: string;
+  };
+
   type BaseResponseNoteVO = {
     code?: number;
     data?: NoteVO;
@@ -44,6 +50,12 @@ declare namespace API {
   type BaseResponsePageNote = {
     code?: number;
     data?: PageNote;
+    message?: string;
+  };
+
+  type BaseResponsePageNotePersonalVO = {
+    code?: number;
+    data?: PageNotePersonalVO;
     message?: string;
   };
 
@@ -169,6 +181,10 @@ declare namespace API {
     id?: number;
   };
 
+  type getNotePersonalVOByIdParams = {
+    id: number;
+  };
+
   type getNoteVOByIdParams = {
     id: number;
   };
@@ -248,10 +264,9 @@ declare namespace API {
     title?: string;
     content?: string;
     tags?: string[];
-    picture?: string;
     visible?: number;
     isTop?: number;
-    categoriesList?: number[];
+    categoriesIds?: number[];
   };
 
   type NoteEditRequest = {
@@ -263,6 +278,27 @@ declare namespace API {
     visible?: number;
     isTop?: number;
     categoriesList?: number[];
+  };
+
+  type NotePersonalVO = {
+    id?: number;
+    title?: string;
+    content?: string;
+    picture?: string;
+    thumbNum?: number;
+    favourNum?: number;
+    viewNum?: number;
+    visible?: number;
+    isTop?: number;
+    editTime?: string;
+    createTime?: string;
+    updateTime?: string;
+    tagList?: string[];
+    reviewStatus?: number;
+    reviewMessage?: string;
+    reviewerId?: number;
+    reviewTime?: string;
+    categoriesVOList?: CategoriesVO[];
   };
 
   type NoteQueryByCategoriesRequest = {
@@ -349,6 +385,20 @@ declare namespace API {
     orders?: OrderItem[];
     optimizeCountSql?: PageNote;
     searchCount?: PageNote;
+    optimizeJoinOfCountSql?: boolean;
+    maxLimit?: number;
+    countId?: string;
+    pages?: number;
+  };
+
+  type PageNotePersonalVO = {
+    records?: NotePersonalVO[];
+    total?: number;
+    size?: number;
+    current?: number;
+    orders?: OrderItem[];
+    optimizeCountSql?: PageNotePersonalVO;
+    searchCount?: PageNotePersonalVO;
     optimizeJoinOfCountSql?: boolean;
     maxLimit?: number;
     countId?: string;

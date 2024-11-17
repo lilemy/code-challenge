@@ -1,4 +1,5 @@
 import CalendarChart from '@/pages/Account/Center/components/CalendarChart';
+import PersonalNoteList from '@/pages/Account/Center/components/PersonalNoteList';
 import PersonalQuestionList from '@/pages/Account/Center/components/PersonalQuestionList';
 import { listMyQuestionVoByPage } from '@/services/code-challenge/questionController';
 import { getLoginUser } from '@/services/code-challenge/userController';
@@ -56,6 +57,9 @@ const Center: React.FC = () => {
     if (tabValue === 'question') {
       return <PersonalQuestionList questionList={userQuestionList} />;
     }
+    if (tabValue === 'note') {
+      return <PersonalNoteList />;
+    }
     return null;
   };
 
@@ -100,6 +104,10 @@ const Center: React.FC = () => {
               {
                 key: 'question',
                 label: '创建题目',
+              },
+              {
+                key: 'note',
+                label: '我的笔记',
               },
             ]}
             activeTabKey={activeTabKey}

@@ -22,7 +22,7 @@ const Footer: React.FC = () => {
         }}
         links={[
           {
-            key: 'code-challenge',
+            key: 'code-challenge-gongan',
             title: (
               <>
                 <Image src="/beian.png" alt="备案" width={17} height={17} />
@@ -33,7 +33,7 @@ const Footer: React.FC = () => {
             blankTarget: true,
           },
           {
-            key: 'code-challenge',
+            key: 'code-challenge-icp',
             title: '渝ICP备2024030252号-1',
             href: 'https://beian.miit.gov.cn/',
             blankTarget: true,

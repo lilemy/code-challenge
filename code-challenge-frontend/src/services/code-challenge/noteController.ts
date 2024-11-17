@@ -50,6 +50,21 @@ export async function editNote(body: API.NoteEditRequest, options?: { [key: stri
   });
 }
 
+/** 根据 id 获取个人笔记 GET /note/get/my/vo */
+export async function getNotePersonalVoById(
+  // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
+  params: API.getNotePersonalVOByIdParams,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponseNotePersonalVO>('/note/get/my/vo', {
+    method: 'GET',
+    params: {
+      ...params,
+    },
+    ...(options || {}),
+  });
+}
+
 /** 根据id获取笔记封装 GET /note/get/vo */
 export async function getNoteVoById(
   // 叠加生成的Param类型 (非body参数swagger默认没有生成对象)
@@ -77,12 +92,27 @@ export async function listNoteByPage(body: API.NoteQueryRequest, options?: { [ke
   });
 }
 
-/** 分页获取笔记列表（封装类） POST /note/list/id/vo */
+/** 根据分类 id 分页获取笔记列表（封装类） POST /note/list/id/vo */
 export async function listNoteVoByCategoriesId(
   body: API.NoteQueryByCategoriesRequest,
   options?: { [key: string]: any },
 ) {
   return request<API.BaseResponsePageNoteVO>('/note/list/id/vo', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: body,
+    ...(options || {}),
+  });
+}
+
+/** 分页获取个人笔记列表 POST /note/list/my/vo */
+export async function listMyNoteVoByPage(
+  body: API.NoteQueryRequest,
+  options?: { [key: string]: any },
+) {
+  return request<API.BaseResponsePageNotePersonalVO>('/note/list/my/vo', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

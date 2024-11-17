@@ -20,19 +20,22 @@ const NoteCard = (props: Props) => {
   const [shareModalVisible, setShareModalVisible] = useState<boolean>(false);
   return (
     <div>
+      <Card>
+
+      </Card>
       <Card
         actions={[
           <div key="fire">
             <FireOutlined />
-            {note.viewNum}
+            {note.viewNum || '浏览'}
           </div>,
           <div key="like">
             <LikeOutlined />
-            {note.thumbNum}
+            {note.thumbNum || '点赞'}
           </div>,
           <div key="heart">
             <HeartOutlined />
-            {note.favourNum}
+            {note.favourNum || '收藏'}
           </div>,
           <div
             key="share"
