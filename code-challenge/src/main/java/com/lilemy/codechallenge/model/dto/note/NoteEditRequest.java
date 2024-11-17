@@ -52,5 +52,5 @@ public class NoteEditRequest implements Serializable {
     /**
      * 笔记分类列表
      */
-    private List<Long> CategoriesList;
+    private List<Long> categoriesList;
 }

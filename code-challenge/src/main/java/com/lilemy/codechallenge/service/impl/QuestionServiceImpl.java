@@ -189,7 +189,9 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
                 .eq(QuestionBankQuestion::getQuestionId, id);
         List<Long> bankIds = questionBankQuestionService.listObjs(lambdaQueryWrapper, obj -> (Long) obj);
         // 获取需要添加的题目题库关联
-        List<Long> addIdList = new ArrayList<>(questionBankList);
+        List<Long> addIdList = CollUtil.isNotEmpty(questionBankList)
+                ? new ArrayList<>(questionBankList)
+                : new ArrayList<>();
         addIdList.removeAll(bankIds);
         if (CollUtil.isNotEmpty(addIdList)) {
             List<QuestionBankQuestion> questionBankQuestionList = addIdList.stream()
@@ -205,7 +207,9 @@ public class QuestionServiceImpl extends ServiceImpl<QuestionMapper, Question>
             questionBankQuestionService.saveBatch(questionBankQuestionList);
         }
         // 获取需要删除的题目题库关联
-        List<Long> deleteIdList = new ArrayList<>(bankIds);
+        List<Long> deleteIdList = CollUtil.isNotEmpty(bankIds)
+                ? new ArrayList<>(bankIds)
+                : new ArrayList<>();
         deleteIdList.removeAll(questionBankList);
         if (CollUtil.isNotEmpty(deleteIdList)) {
             QueryWrapper<QuestionBankQuestion> queryWrapper = new QueryWrapper<>();

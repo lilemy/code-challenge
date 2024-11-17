@@ -171,10 +171,12 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
         LambdaQueryWrapper<NoteCategories> eq = Wrappers.lambdaQuery(NoteCategories.class)
                 .select(NoteCategories::getCategoriesId)
                 .eq(NoteCategories::getNoteId, noteId);
-        List<Long> CategoriesIds = noteCategoriesService.listObjs(eq, obj -> (Long) obj);
+        List<Long> categoriesIds = noteCategoriesService.listObjs(eq, obj -> (Long) obj);
         // 获取需要添加的笔记分类关联
-        List<Long> addIdList = new ArrayList<>(categoriesList);
-        addIdList.removeAll(CategoriesIds);
+        List<Long> addIdList = CollUtil.isNotEmpty(categoriesList)
+                ? new ArrayList<>(categoriesList)
+                : new ArrayList<>();
+        addIdList.removeAll(categoriesIds);
         if (CollUtil.isNotEmpty(addIdList)) {
             List<NoteCategories> noteCategoriesList = addIdList.stream().map(categoriesId -> {
                 NoteCategories noteCategories = new NoteCategories();
@@ -186,7 +188,9 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
             noteCategoriesService.saveBatch(noteCategoriesList);
         }
         // 获取需要删除的笔记分类关联
-        List<Long> deleteIdList = new ArrayList<>(CategoriesIds);
+        List<Long> deleteIdList = CollUtil.isNotEmpty(categoriesIds)
+                ? new ArrayList<>(categoriesIds)
+                : new ArrayList<>();
         deleteIdList.removeAll(categoriesList);
         if (CollUtil.isNotEmpty(deleteIdList)) {
             QueryWrapper<NoteCategories> queryWrapper = new QueryWrapper<>();
@@ -271,7 +275,7 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
         String underlineSortField = StrUtil.toUnderlineCase(sortField);
         // 是否需要笔记内容
         if (!isNeedContent) {
-            queryWrapper.select("id", "title", "tags", "user_id",
+            queryWrapper.select("id", "title", "tags", "user_id", "picture",
                     "review_status", "review_message", "review_time", "reviewer_id",
                     "view_num", "thumb_num", "favour_num", "visible", "is_top",
                     "edit_time", "create_time", "update_time", "is_delete");
@@ -440,7 +444,3 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
         return true;
     }
 }
-
-
-
-

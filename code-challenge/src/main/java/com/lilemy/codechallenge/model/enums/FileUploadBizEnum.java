@@ -15,7 +15,9 @@ public enum FileUploadBizEnum {
 
     USER_AVATAR("用户头像", "user_avatar"),
     QUESTION_BANK_AVATAR("题库头像", "question_bank_avatar"),
-    QUESTION_MD("题目文档图片", "question_md");
+    QUESTION_MD("题目文档图片", "question_md"),
+    NOTE_AVATAR("笔记封面", "note_avatar"),
+    NOTE_MD("笔记文档图片", "note_md");
 
     private final String text;
 
