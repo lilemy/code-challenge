@@ -30,11 +30,6 @@ public class NoteCreateRequest implements Serializable {
     private List<String> tags;
 
     /**
-     * 图片
-     */
-    private String picture;
-
-    /**
      * 可见范围(0-公开, 1-仅对自己可见)
      */
     private Integer visible;
@@ -47,5 +42,5 @@ public class NoteCreateRequest implements Serializable {
     /**
      * 笔记分类列表
      */
-    private List<Long> CategoriesList;
+    private List<Long> categoriesIds;
 }

@@ -11,9 +11,12 @@ import com.lilemy.codechallenge.constant.UserConstant;
 import com.lilemy.codechallenge.exception.ThrowUtils;
 import com.lilemy.codechallenge.model.dto.note.*;
 import com.lilemy.codechallenge.model.entity.Note;
+import com.lilemy.codechallenge.model.entity.User;
 import com.lilemy.codechallenge.model.enums.ReviewStatusEnum;
+import com.lilemy.codechallenge.model.vo.NotePersonalVO;
 import com.lilemy.codechallenge.model.vo.NoteVO;
 import com.lilemy.codechallenge.service.NoteService;
+import com.lilemy.codechallenge.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Resource;
@@ -32,6 +35,9 @@ public class NoteController {
 
     @Resource
     private NoteService noteService;
+
+    @Resource
+    private UserService userService;
 
     // region 增删改查
 
@@ -74,7 +80,7 @@ public class NoteController {
     @Operation(summary = "更新笔记")
     @PostMapping("/update")
     @SaCheckRole(UserConstant.ADMIN_ROLE)
-    public BaseResponse<Boolean> updateNote(@RequestBody NoteUpdateRequest noteUpdateRequest){
+    public BaseResponse<Boolean> updateNote(@RequestBody NoteUpdateRequest noteUpdateRequest) {
         ThrowUtils.throwIf(noteUpdateRequest == null, ResultCode.PARAMS_ERROR);
         Boolean result = noteService.updateNote(noteUpdateRequest);
         return ResultUtils.success(result);
@@ -92,6 +98,14 @@ public class NoteController {
         ThrowUtils.throwIf(reviewStatus != ReviewStatusEnum.PASS.getValue(), ResultCode.NO_AUTH_ERROR);
         // 获取封装类
         return ResultUtils.success(noteService.getNoteVO(note));
+    }
+
+    @Operation(summary = "根据 id 获取个人笔记")
+    @GetMapping("/get/my/vo")
+    public BaseResponse<NotePersonalVO> getNotePersonalVOById(Long id) {
+        ThrowUtils.throwIf(id <= 0, ResultCode.PARAMS_ERROR);
+        NotePersonalVO notePersonalVO = noteService.getNotePersonalById(id);
+        return ResultUtils.success(notePersonalVO);
     }
 
     @Operation(summary = "分页获取笔记列表（仅管理员可用）")
@@ -135,6 +149,31 @@ public class NoteController {
                 noteService.getReviewQueryWrapper(noteQueryRequest));
         // 获取封装类
         return ResultUtils.success(noteService.getNoteVOPage(notePage));
+    }
+
+    @Operation(summary = "根据分类 id 分页获取笔记列表（封装类）")
+    @PostMapping("/list/id/vo")
+    public BaseResponse<Page<NoteVO>> listNoteVOByCategoriesId(@RequestBody NoteQueryByCategoriesRequest noteQueryByCategoriesRequest) {
+        ThrowUtils.throwIf(noteQueryByCategoriesRequest == null, ResultCode.PARAMS_ERROR);
+        Page<Note> notePage = noteService.getNotePageByCategoriesId(noteQueryByCategoriesRequest);
+        // 获取封装类
+        return ResultUtils.success(noteService.getNoteVOPage(notePage));
+    }
+
+    @Operation(summary = "分页获取个人笔记列表")
+    @PostMapping("/list/my/vo")
+    public BaseResponse<Page<NotePersonalVO>> listMyNoteVOByPage(@RequestBody NoteQueryRequest noteQueryRequest) {
+        ThrowUtils.throwIf(noteQueryRequest == null, ResultCode.PARAMS_ERROR);
+        long current = noteQueryRequest.getCurrent();
+        long size = noteQueryRequest.getPageSize();
+        // 获取当前登录用户
+        User loginUser = userService.getLoginUser();
+        noteQueryRequest.setUserId(loginUser.getId());
+        // 查询数据库
+        Page<Note> notePage = noteService.page(new Page<>(current, size),
+                noteService.getQueryWrapper(noteQueryRequest));
+        // 获取封装类
+        return ResultUtils.success(noteService.getNotePersonalPageByPage(notePage));
     }
 
     // endregion

@@ -2,19 +2,19 @@ spring:
   # 数据库配置
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://192.168.37.129:3306/code_challenge
+    url: jdbc:mysql://192.168.37.130:3306/code_challenge
     username: root
     password: 123456
   # Redis 配置
   data:
     redis:
       database: 5
-      host: 192.168.37.129
+      host: 192.168.37.130
       port: 6379
       timeout: 5000
   # elasticsearch 配置
   elasticsearch:
-    uris: http://192.168.37.129:9200
+    uris: http://192.168.37.130:9200
     username: elastic
     password: 123456
 # mybatis-plus配置
@@ -30,7 +30,7 @@ storage:
   file:
     type: minio # 对象存储类型
 minio:
-  endpoint: http://192.168.37.129:9000
+  endpoint: http://192.168.37.130:9000
   accessKey: lilemy
   secretKey: 12345678
   bucketName: code-challenge

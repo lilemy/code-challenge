@@ -21,7 +21,7 @@ public class Categories implements Serializable {
     private Long id;
 
     /**
-     * 笔记 id
+     * 笔记分类名称
      */
     private String name;
 

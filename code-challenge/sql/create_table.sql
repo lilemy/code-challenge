@@ -131,7 +131,7 @@ create table if not exists note_favour
 create table if not exists categories
 (
     `id`          bigint auto_increment comment 'id' primary key,
-    `name`        varchar(256)                       not null comment '笔记 id',
+    `name`        varchar(256)                       not null comment '笔记分类名称',
     `priority`    int      default 0                 not null comment '优先级',
     `create_time` datetime default CURRENT_TIMESTAMP not null comment '创建时间',
     `update_time` datetime default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP comment '更新时间',

@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.lilemy.codechallenge.model.dto.note.*;
 import com.lilemy.codechallenge.model.entity.Note;
+import com.lilemy.codechallenge.model.vo.NotePersonalVO;
 import com.lilemy.codechallenge.model.vo.NoteVO;
 
 /**
@@ -62,6 +63,14 @@ public interface NoteService extends IService<Note> {
     NoteVO getNoteVO(Note note);
 
     /**
+     * 根据 id 获取个人笔记
+     *
+     * @param id 笔记 id
+     * @return 个人笔记信息
+     */
+    NotePersonalVO getNotePersonalById(Long id);
+
+    /**
      * 构建笔记查询条件
      *
      * @param noteQueryRequest 笔记查询请求体
@@ -78,12 +87,28 @@ public interface NoteService extends IService<Note> {
     QueryWrapper<Note> getReviewQueryWrapper(NoteQueryRequest noteQueryRequest);
 
     /**
+     * 根据分类 id 获取笔记分页列表
+     *
+     * @param noteQueryByCategoriesRequest 根据分类 id 获取笔记分页请求体
+     * @return 笔记分页
+     */
+    Page<Note> getNotePageByCategoriesId(NoteQueryByCategoriesRequest noteQueryByCategoriesRequest);
+
+    /**
      * 分页获取笔记信息封装
      *
      * @param notePage 笔记信息分页
      * @return 笔记封装信息分页
      */
     Page<NoteVO> getNoteVOPage(Page<Note> notePage);
+
+    /**
+     * 获取个人笔记信息封装
+     *
+     * @param notePage 笔记信息分页
+     * @return 个人笔记信息分页
+     */
+    Page<NotePersonalVO> getNotePersonalPageByPage(Page<Note> notePage);
 
     /**
      * 笔记审核

@@ -15,8 +15,13 @@ import com.lilemy.codechallenge.exception.BusinessException;
 import com.lilemy.codechallenge.exception.ThrowUtils;
 import com.lilemy.codechallenge.mapper.NoteMapper;
 import com.lilemy.codechallenge.model.dto.note.*;
-import com.lilemy.codechallenge.model.entity.*;
+import com.lilemy.codechallenge.model.entity.Categories;
+import com.lilemy.codechallenge.model.entity.Note;
+import com.lilemy.codechallenge.model.entity.NoteCategories;
+import com.lilemy.codechallenge.model.entity.User;
 import com.lilemy.codechallenge.model.enums.ReviewStatusEnum;
+import com.lilemy.codechallenge.model.vo.CategoriesVO;
+import com.lilemy.codechallenge.model.vo.NotePersonalVO;
 import com.lilemy.codechallenge.model.vo.NoteVO;
 import com.lilemy.codechallenge.model.vo.UserVO;
 import com.lilemy.codechallenge.service.CategoriesService;
@@ -87,7 +92,7 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
         // 写入数据库
         boolean result = this.save(note);
         ThrowUtils.throwIf(!result, ResultCode.OPERATION_ERROR);
-        List<Long> categoriesList = noteCreateRequest.getCategoriesList();
+        List<Long> categoriesList = noteCreateRequest.getCategoriesIds();
         if (CollUtil.isNotEmpty(categoriesList)) {
             // 查询对应分类是否存在
             LambdaQueryWrapper<Categories> queryWrapper = new LambdaQueryWrapper<>();
@@ -222,6 +227,30 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
     }
 
     @Override
+    public NotePersonalVO getNotePersonalById(Long id) {
+        // 查询数据库
+        Note note = this.getById(id);
+        ThrowUtils.throwIf(note == null, ResultCode.NOT_FOUND_ERROR);
+        // 判断是否为创建用户
+        Long loginUserId = userService.getLoginUser().getId();
+        ThrowUtils.throwIf(!note.getUserId().equals(loginUserId), ResultCode.NO_AUTH_ERROR);
+        NotePersonalVO notePersonalVO = NotePersonalVO.objToVo(note);
+        LambdaQueryWrapper<NoteCategories> eq = Wrappers.lambdaQuery(NoteCategories.class)
+                .select(NoteCategories::getCategoriesId)
+                .eq(NoteCategories::getNoteId, id);
+        List<Long> categoriesIdList = noteCategoriesService.listObjs(eq, obj -> (Long) obj);
+        if (CollUtil.isNotEmpty(categoriesIdList)) {
+            QueryWrapper<Categories> categoriesQueryWrapper = new QueryWrapper<>();
+            categoriesQueryWrapper.in("id", categoriesIdList);
+            categoriesQueryWrapper.select("id", "name", "priority", "create_time", "update_time");
+            List<CategoriesVO> categoriesVOList = categoriesService.list(categoriesQueryWrapper)
+                    .stream().map(CategoriesVO::objToVo).toList();
+            notePersonalVO.setCategoriesVOList(categoriesVOList);
+        }
+        return notePersonalVO;
+    }
+
+    @Override
     public QueryWrapper<Note> getQueryWrapper(NoteQueryRequest noteQueryRequest) {
         QueryWrapper<Note> queryWrapper = new QueryWrapper<>();
         if (noteQueryRequest == null) {
@@ -242,7 +271,7 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
         String underlineSortField = StrUtil.toUnderlineCase(sortField);
         // 是否需要笔记内容
         if (!isNeedContent) {
-            queryWrapper.select("id", "title", "content", "tags", "user_id",
+            queryWrapper.select("id", "title", "tags", "user_id",
                     "review_status", "review_message", "review_time", "reviewer_id",
                     "view_num", "thumb_num", "favour_num", "visible", "is_top",
                     "edit_time", "create_time", "update_time", "is_delete");
@@ -280,6 +309,34 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
     }
 
     @Override
+    public Page<Note> getNotePageByCategoriesId(NoteQueryByCategoriesRequest noteQueryByCategoriesRequest) {
+        Long categoriesId = noteQueryByCategoriesRequest.getCategoriesId();
+        ThrowUtils.throwIf(categoriesId <= 0, ResultCode.PARAMS_ERROR);
+        LambdaQueryWrapper<NoteCategories> lambdaQueryWrapper = Wrappers.lambdaQuery(NoteCategories.class)
+                .select(NoteCategories::getNoteId)
+                .eq(NoteCategories::getCategoriesId, categoriesId);
+        List<Long> noteIdList = noteCategoriesService.listObjs(lambdaQueryWrapper, obj -> (Long) obj);
+        QueryWrapper<Note> queryWrapper = new QueryWrapper<>();
+        // 获取已审核的笔记
+        queryWrapper.eq("review_status", ReviewStatusEnum.PASS.getValue());
+        int current = noteQueryByCategoriesRequest.getCurrent();
+        int pageSize = noteQueryByCategoriesRequest.getPageSize();
+        String sortField = noteQueryByCategoriesRequest.getSortField();
+        String sortOrder = noteQueryByCategoriesRequest.getSortOrder();
+        String underlineSortField = StrUtil.toUnderlineCase(sortField);
+        if (CollUtil.isEmpty(noteIdList)) {
+            return new Page<>(current, pageSize);
+        }
+        queryWrapper.in("id", noteIdList);
+        // 排序规则
+        queryWrapper.orderBy(SqlUtils.validSortField(sortField),
+                sortOrder.equals(CommonConstant.SORT_ORDER_ASC),
+                underlineSortField);
+        // 查询数据库
+        return this.page(new Page<>(current, pageSize), queryWrapper);
+    }
+
+    @Override
     public Page<NoteVO> getNoteVOPage(Page<Note> notePage) {
         List<Note> noteList = notePage.getRecords();
         Page<NoteVO> noteVOPage = new Page<>(notePage.getCurrent(), notePage.getSize(), notePage.getTotal());
@@ -303,6 +360,50 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
         });
         noteVOPage.setRecords(noteVOList);
         return noteVOPage;
+    }
+
+    @Override
+    public Page<NotePersonalVO> getNotePersonalPageByPage(Page<Note> notePage) {
+        List<Note> noteList = notePage.getRecords();
+        Page<NotePersonalVO> notePersonalVOPage = new Page<>(notePage.getCurrent(), notePage.getSize(), notePage.getTotal());
+        if (CollUtil.isEmpty(noteList)) {
+            return notePersonalVOPage;
+        }
+        // 对象列表转封装对象列表
+        List<NotePersonalVO> notePersonalList = noteList.stream().map(NotePersonalVO::objToVo).toList();
+        // 关联查询分类信息
+        Map<Long, List<CategoriesVO>> noteCategoriesListVO = noteList.stream().collect(Collectors.toMap(
+                Note::getId,
+                note -> {
+                    Long noteId = note.getId();
+                    LambdaQueryWrapper<NoteCategories> eq = Wrappers.lambdaQuery(NoteCategories.class)
+                            .select(NoteCategories::getCategoriesId)
+                            .eq(NoteCategories::getNoteId, noteId);
+                    // 获取所属分类列表
+                    List<Long> noteCategoriesIdList = noteCategoriesService.listObjs(eq, obj -> (Long) obj);
+                    if (CollUtil.isNotEmpty(noteCategoriesIdList)) {
+                        QueryWrapper<Categories> categoriesQueryWrapper = new QueryWrapper<>();
+                        categoriesQueryWrapper.in("id", noteCategoriesIdList);
+                        categoriesQueryWrapper.select("id", "name", "priority", "create_time", "update_time");
+                        List<Categories> categoriesList = categoriesService.list(categoriesQueryWrapper);
+                        return categoriesList.stream()
+                                .map(CategoriesVO::objToVo)
+                                .collect(Collectors.toList());
+                    }
+                    return Collections.emptyList();
+                }
+        ));
+        // 填充信息
+        notePersonalList.forEach(notePersonalVO -> {
+            Long noteId = notePersonalVO.getId();
+            List<CategoriesVO> categoriesVOList = new ArrayList<>();
+            if (noteCategoriesListVO.containsKey(noteId)) {
+                categoriesVOList = noteCategoriesListVO.get(noteId);
+            }
+            notePersonalVO.setCategoriesVOList(categoriesVOList);
+        });
+        notePersonalVOPage.setRecords(notePersonalList);
+        return notePersonalVOPage;
     }
 
     @Override
