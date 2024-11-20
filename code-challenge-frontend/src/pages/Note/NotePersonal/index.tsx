@@ -6,13 +6,7 @@ import { listCategoriesVoByPage } from '@/services/code-challenge/categoriesCont
 import { uploadFile } from '@/services/code-challenge/fileController';
 import { editNote, getNotePersonalVoById } from '@/services/code-challenge/noteController';
 import { useParams } from '@@/exports';
-import {
-  ExportOutlined,
-  FireOutlined,
-  HeartOutlined,
-  LikeOutlined,
-  UploadOutlined,
-} from '@ant-design/icons';
+import { FireOutlined, HeartOutlined, LikeOutlined, UploadOutlined } from '@ant-design/icons';
 import {
   ProDescriptions,
   ProFormRadio,
@@ -77,9 +71,9 @@ const NotePersonalPage: React.FC = () => {
     loadData().then(() => '');
   }, []);
   const categoriesIdList = note.categoriesVOList?.map((value) => value.id);
-  const categoriesListForm = categoriesList.map((categirues) => ({
-    value: categirues.id,
-    label: categirues.name,
+  const categoriesListForm = categoriesList.map((categories) => ({
+    value: categories.id,
+    label: categories.name,
   }));
   const reviewColumns = [
     {
@@ -278,15 +272,6 @@ const NotePersonalPage: React.FC = () => {
                   <HeartOutlined />
                   {note.favourNum || '收藏'}
                 </div>,
-                <div
-                  key="share"
-                  onClick={() => {
-                    setShareModalVisible(true);
-                  }}
-                >
-                  <ExportOutlined />
-                  分享
-                </div>,
               ]}
             >
               <Flex justify="space-between" align="center">
@@ -399,7 +384,7 @@ const NotePersonalPage: React.FC = () => {
                           {picList.map((pic, key) => {
                             return (
                               <ProDescriptions.Item key={key} copyable={true} valueType="text">
-                                {`<img src="${pic}" alt="">`}
+                                {`![](${pic})`}
                               </ProDescriptions.Item>
                             );
                           })}

@@ -157,6 +157,7 @@ declare namespace API {
 
   type CategoriesCreateRequest = {
     name?: string;
+    priority?: number;
   };
 
   type CategoriesQueryRequest = {
@@ -167,6 +168,12 @@ declare namespace API {
     id?: number;
     notId?: number;
     name?: string;
+  };
+
+  type CategoriesUpdateRequest = {
+    id?: number;
+    name?: string;
+    priority?: number;
   };
 
   type CategoriesVO = {

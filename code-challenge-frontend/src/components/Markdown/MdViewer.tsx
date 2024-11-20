@@ -5,6 +5,7 @@ import { setTheme } from 'bytemd-plugin-theme';
 import 'bytemd/dist/index.css';
 import 'highlight.js/styles/vs.css';
 import { useEffect } from 'react';
+import MdUtils from '@/utils/MdUtils';
 
 interface Props {
   value?: string;
@@ -20,6 +21,7 @@ const plugins = [gfm(), highlight()];
  */
 const MdViewer = (props: Props) => {
   const { value = '', theme = 'qklhk-chocolate' } = props;
+  const contentWithIds = MdUtils.addHeadingIds(value);
 
   useEffect(() => {
     setTheme(theme);
@@ -27,7 +29,7 @@ const MdViewer = (props: Props) => {
 
   return (
     <div className="md-viewer">
-      <Viewer value={value} plugins={plugins} />
+      <Viewer value={contentWithIds} plugins={plugins} />
     </div>
   );
 };

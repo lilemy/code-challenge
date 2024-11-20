@@ -105,6 +105,11 @@ export default [
         component: './Admin/Review/Note',
         hideInMenu: true,
       },
+      {
+        path: '/admin/categories',
+        name: '笔记分类管理',
+        component: './Admin/Categories',
+      },
     ],
   },
   { path: '/', redirect: '/welcome' },

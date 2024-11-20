@@ -20,9 +20,6 @@ const NoteCard = (props: Props) => {
   const [shareModalVisible, setShareModalVisible] = useState<boolean>(false);
   return (
     <div>
-      <Card>
-
-      </Card>
       <Card
         actions={[
           <div key="fire">

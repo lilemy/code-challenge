@@ -73,7 +73,7 @@ const Center: React.FC = () => {
   return (
     <GridContent className="max-width-content">
       <Row gutter={24}>
-        <Col lg={6} md={24}>
+        <Col xs={24} sm={24} md={6} lg={6} xl={6}>
           <Card loading={loading} bordered={false}>
             <div style={{ textAlign: 'center', marginBottom: '24px' }}>
               {loginUserVO?.userAvatar ? (
@@ -94,7 +94,7 @@ const Center: React.FC = () => {
             </div>
           </Card>
         </Col>
-        <Col lg={18} md={24}>
+        <Col xs={24} sm={24} md={18} lg={18} xl={18}>
           <Card
             tabList={[
               {

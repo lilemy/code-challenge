@@ -1,8 +1,9 @@
+import ContentPage from '@/components/Content';
 import NoteCard from '@/components/NoteCard';
-import React, {useEffect, useState} from 'react';
-import {useParams} from "@@/exports";
-import {getNoteVoById} from "@/services/code-challenge/noteController";
-import {message} from "antd";
+import { getNoteVoById } from '@/services/code-challenge/noteController';
+import { useParams } from '@@/exports';
+import { Affix, Card, Col, message, Row } from 'antd';
+import React, { useEffect, useState } from 'react';
 
 const NoteDetailPage: React.FC = () => {
   const params = useParams();
@@ -31,7 +32,18 @@ const NoteDetailPage: React.FC = () => {
 
   return (
     <div className="max-width-content">
-      <NoteCard note={note} />
+      <Row wrap={true}>
+        <Col xs={24} sm={24} md={24} lg={18} xl={18}>
+          <NoteCard note={note} />
+        </Col>
+        <Col xs={0} sm={0} md={0} lg={6} xl={6}>
+          <Affix offsetTop={80}>
+            <Card>
+              <ContentPage markdown={note.content || ''} />
+            </Card>
+          </Affix>
+        </Col>
+      </Row>
     </div>
   );
 };
