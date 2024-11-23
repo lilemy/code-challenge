@@ -1,4 +1,4 @@
-import {TreeDataNode} from "antd";
+import { TreeDataNode } from 'antd';
 
 /**
  * 提取 Markdown 中的标题
@@ -44,6 +44,9 @@ const extractHeadingsAsTreeData = (markdown: string): TreeDataNode[] => {
  * @param markdown
  */
 const addHeadingIds = (markdown: string) => {
+  if (!markdown) {
+    return '';
+  }
   return markdown.replace(/^(#{1,6})\s+(.*)/gm, (_, hashes, text) => {
     const id = text.trim().toLowerCase().replace(/\s+/g, '-');
     return `${hashes} <span id="${id}"></span>${text}`;

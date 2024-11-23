@@ -159,7 +159,7 @@ const NoteTableList: React.FC = () => {
           const sortField = Object.keys(sort)?.[0];
           const sortOrder = sort?.[sortField] ?? undefined;
           const { data, code } = await listNoteByPage({
-            needAnswer: true,
+            needContent: true,
             ...params,
             sortField,
             sortOrder,
