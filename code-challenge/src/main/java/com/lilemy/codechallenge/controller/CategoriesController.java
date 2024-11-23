@@ -1,12 +1,16 @@
 package com.lilemy.codechallenge.controller;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lilemy.codechallenge.common.BaseResponse;
+import com.lilemy.codechallenge.common.DeleteRequest;
 import com.lilemy.codechallenge.common.ResultCode;
 import com.lilemy.codechallenge.common.ResultUtils;
+import com.lilemy.codechallenge.constant.UserConstant;
 import com.lilemy.codechallenge.exception.ThrowUtils;
 import com.lilemy.codechallenge.model.dto.categories.CategoriesCreateRequest;
 import com.lilemy.codechallenge.model.dto.categories.CategoriesQueryRequest;
+import com.lilemy.codechallenge.model.dto.categories.CategoriesUpdateRequest;
 import com.lilemy.codechallenge.model.entity.Categories;
 import com.lilemy.codechallenge.model.vo.CategoriesVO;
 import com.lilemy.codechallenge.service.CategoriesService;
@@ -34,6 +38,7 @@ public class CategoriesController {
 
     @Operation(summary = "创建笔记分类")
     @PostMapping("/create")
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
     public BaseResponse<Long> createCategories(@RequestBody CategoriesCreateRequest categoriesCreateRequest) {
         ThrowUtils.throwIf(categoriesCreateRequest == null, ResultCode.PARAMS_ERROR);
         Categories categories = new Categories();
@@ -42,6 +47,29 @@ public class CategoriesController {
         boolean save = categoriesService.save(categories);
         ThrowUtils.throwIf(!save, ResultCode.SUCCESS);
         return ResultUtils.success(categories.getId());
+    }
+
+    @Operation(summary = "删除笔记分类")
+    @PostMapping("/delete")
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> deleteCategories(@RequestBody DeleteRequest deleteRequest) {
+        Long categoriesId = deleteRequest.getId();
+        ThrowUtils.throwIf(categoriesId <= 0, ResultCode.PARAMS_ERROR);
+        boolean result = categoriesService.deleteCategories(categoriesId);
+        return ResultUtils.success(result);
+    }
+
+    @Operation(summary = "更新笔记分类")
+    @PostMapping("/update")
+    @SaCheckRole(UserConstant.ADMIN_ROLE)
+    public BaseResponse<Boolean> updateCategories(@RequestBody CategoriesUpdateRequest categoriesUpdateRequest) {
+        ThrowUtils.throwIf(categoriesUpdateRequest == null, ResultCode.PARAMS_ERROR);
+        Categories categories = new Categories();
+        BeanUtils.copyProperties(categoriesUpdateRequest, categories);
+        categoriesService.validCategories(categories, false);
+        boolean result = categoriesService.updateById(categories);
+        ThrowUtils.throwIf(!result, ResultCode.OPERATION_ERROR);
+        return ResultUtils.success(true);
     }
 
     @Operation(summary = "分页获取笔记分类列表（封装类）")

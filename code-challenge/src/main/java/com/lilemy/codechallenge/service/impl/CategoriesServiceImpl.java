@@ -7,13 +7,17 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lilemy.codechallenge.common.ResultCode;
 import com.lilemy.codechallenge.constant.CommonConstant;
+import com.lilemy.codechallenge.exception.BusinessException;
 import com.lilemy.codechallenge.exception.ThrowUtils;
 import com.lilemy.codechallenge.mapper.CategoriesMapper;
 import com.lilemy.codechallenge.model.dto.categories.CategoriesQueryRequest;
 import com.lilemy.codechallenge.model.entity.Categories;
+import com.lilemy.codechallenge.model.entity.User;
 import com.lilemy.codechallenge.model.vo.CategoriesVO;
 import com.lilemy.codechallenge.service.CategoriesService;
+import com.lilemy.codechallenge.service.UserService;
 import com.lilemy.codechallenge.util.SqlUtils;
+import jakarta.annotation.Resource;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -28,6 +32,9 @@ import java.util.List;
 public class CategoriesServiceImpl extends ServiceImpl<CategoriesMapper, Categories>
         implements CategoriesService {
 
+    @Resource
+    private UserService userService;
+
     @Override
     public void validCategories(Categories categories, boolean add) {
         ThrowUtils.throwIf(categories == null, ResultCode.PARAMS_ERROR);
@@ -41,6 +48,17 @@ public class CategoriesServiceImpl extends ServiceImpl<CategoriesMapper, Categor
         if (StringUtils.isNotBlank(name)) {
             ThrowUtils.throwIf(name.length() > 20, ResultCode.PARAMS_ERROR, "分类名称过长");
         }
+    }
+
+    @Override
+    public boolean deleteCategories(Long categoriesId) {
+        // todo 关联删除笔记分类关系
+        Categories categories = this.getById(categoriesId);
+        ThrowUtils.throwIf(categories == null, ResultCode.NOT_FOUND_ERROR);
+        // 操作数据库
+        boolean result = this.removeById(categoriesId);
+        ThrowUtils.throwIf(!result, ResultCode.SUCCESS);
+        return true;
     }
 
     @Override

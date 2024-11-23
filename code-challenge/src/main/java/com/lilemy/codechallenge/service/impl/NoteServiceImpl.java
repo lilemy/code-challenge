@@ -20,6 +20,7 @@ import com.lilemy.codechallenge.model.entity.Note;
 import com.lilemy.codechallenge.model.entity.NoteCategories;
 import com.lilemy.codechallenge.model.entity.User;
 import com.lilemy.codechallenge.model.enums.ReviewStatusEnum;
+import com.lilemy.codechallenge.model.enums.VisibleStatusEnum;
 import com.lilemy.codechallenge.model.vo.CategoriesVO;
 import com.lilemy.codechallenge.model.vo.NotePersonalVO;
 import com.lilemy.codechallenge.model.vo.NoteVO;
@@ -191,7 +192,9 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
         List<Long> deleteIdList = CollUtil.isNotEmpty(categoriesIds)
                 ? new ArrayList<>(categoriesIds)
                 : new ArrayList<>();
-        deleteIdList.removeAll(categoriesList);
+        if (CollUtil.isNotEmpty(categoriesList)) {
+            deleteIdList.removeAll(categoriesList);
+        }
         if (CollUtil.isNotEmpty(deleteIdList)) {
             QueryWrapper<NoteCategories> queryWrapper = new QueryWrapper<>();
             queryWrapper.eq("note_id", noteId);
@@ -309,7 +312,9 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
     @Override
     public QueryWrapper<Note> getReviewQueryWrapper(NoteQueryRequest noteQueryRequest) {
         QueryWrapper<Note> queryWrapper = this.getQueryWrapper(noteQueryRequest);
-        return queryWrapper.eq("review_status", ReviewStatusEnum.PASS.getValue());
+        queryWrapper.eq("visible", VisibleStatusEnum.OPEN.getValue());
+        queryWrapper.eq("review_status", ReviewStatusEnum.PASS.getValue());
+        return queryWrapper;
     }
 
     @Override
@@ -323,6 +328,8 @@ public class NoteServiceImpl extends ServiceImpl<NoteMapper, Note>
         QueryWrapper<Note> queryWrapper = new QueryWrapper<>();
         // 获取已审核的笔记
         queryWrapper.eq("review_status", ReviewStatusEnum.PASS.getValue());
+        // 获取公开的笔记
+        queryWrapper.eq("visible", VisibleStatusEnum.OPEN.getValue());
         int current = noteQueryByCategoriesRequest.getCurrent();
         int pageSize = noteQueryByCategoriesRequest.getPageSize();
         String sortField = noteQueryByCategoriesRequest.getSortField();

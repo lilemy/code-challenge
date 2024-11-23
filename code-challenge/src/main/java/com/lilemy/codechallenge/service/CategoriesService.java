@@ -22,6 +22,14 @@ public interface CategoriesService extends IService<Categories> {
     void validCategories(Categories categories, boolean add);
 
     /**
+     * 笔记分类删除
+     *
+     * @param categoriesId 笔记分类 id
+     * @return 是否成功删除
+     */
+    boolean deleteCategories(Long categoriesId);
+
+    /**
      * 构建笔记分类查询条件
      *
      * @param categoriesQueryRequest 笔记分类查询请求体

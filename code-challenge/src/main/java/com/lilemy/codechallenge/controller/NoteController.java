@@ -13,6 +13,7 @@ import com.lilemy.codechallenge.model.dto.note.*;
 import com.lilemy.codechallenge.model.entity.Note;
 import com.lilemy.codechallenge.model.entity.User;
 import com.lilemy.codechallenge.model.enums.ReviewStatusEnum;
+import com.lilemy.codechallenge.model.enums.VisibleStatusEnum;
 import com.lilemy.codechallenge.model.vo.NotePersonalVO;
 import com.lilemy.codechallenge.model.vo.NoteVO;
 import com.lilemy.codechallenge.service.NoteService;
@@ -93,6 +94,9 @@ public class NoteController {
         // 查询数据库
         Note note = noteService.getById(id);
         ThrowUtils.throwIf(note == null, ResultCode.NOT_FOUND_ERROR);
+        // 判断笔记是否公开
+        Integer visible = note.getVisible();
+        ThrowUtils.throwIf(visible == null || visible != VisibleStatusEnum.OPEN.getValue(), ResultCode.NO_AUTH_ERROR);
         Integer reviewStatus = note.getReviewStatus();
         // 判断笔记是否通过审核
         ThrowUtils.throwIf(reviewStatus != ReviewStatusEnum.PASS.getValue(), ResultCode.NO_AUTH_ERROR);
